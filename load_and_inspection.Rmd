@@ -21,3 +21,12 @@ require(sp)
 require(INLA)
 require(gstat)
 ```
+
+
+# Load Data
+```{r}
+data_dir = "./data/"
+asthma_data = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"))
+places_data = read.csv(str_c(data_dir, "dc_cdc_places_tract_data.csv"))
+svi_data = read.csv(str_c(data_dir, "dc_cdc_svi.csv"))
+```

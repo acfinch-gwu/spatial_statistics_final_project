@@ -9,7 +9,7 @@ library(dplyr)
 tmap_mode("view")
 
 # Load FEMA flood hazard shapefile
-flood_data <- st_read("/Users/tatiyanaapanasovich/Downloads/110001_20241031 (2)/S_FLD_HAZ_AR.shp") %>%
+flood_data <- st_read("./data/110001_20241031/S_FLD_HAZ_AR.shp") %>%
   st_make_valid()
 
 unique(flood_data$FLD_ZONE)
