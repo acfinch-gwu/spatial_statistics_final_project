@@ -7,3 +7,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+require(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+```
