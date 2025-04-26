@@ -30,3 +30,80 @@ asthma_data = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"
 places_data = read.csv(str_c(data_dir, "dc_cdc_places_tract_data.csv"))
 svi_data = read.csv(str_c(data_dir, "dc_cdc_svi.csv"))
 ```
+
+
+# Inspect Data
+
+## Asthma Data
+
+```{r}
+summary(asthma_data)
+```
+
+```{r}
+colnames(asthma_data)
+colnames(asthma_data) <- c(
+  "geoid",
+  "name",
+  "unw_cent_long",
+  "unw_cent_lat",
+  "est_pop",
+  "non_his",
+  "white",
+  "black",
+  "amer_indian",
+  "asian",
+  "hawaiian",
+  "other",
+  "two_or_more",
+  "hispanic",
+  "educated",
+  "med_income",
+  "below_pov",
+  "income_to_pov",
+  
+)
+```
+
+```{r}
+asthma = as_tibble(asthma_data)
+```
+
+### EDA Plotting
+
+
+## Places Data
+
+```{r}
+summary(places_data)
+```
+
+```{r}
+colnames(places_data)
+# colnames(places_data) <- c()
+```
+
+```{r}
+places = as_tibble(places_data)
+```
+
+### EDA Plotting
+
+
+## SVI Data
+
+```{r}
+summary(svi_data)
+```
+
+```{r}
+colnames(svi_data)
+# colnames(svi_data) <- c()
+```
+
+```{r}
+svi = as_tibble(svi_data)
+```
+
+
+
