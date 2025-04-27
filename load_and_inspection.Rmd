@@ -20,34 +20,34 @@ require(sphet)
 require(sp)
 require(INLA)
 require(gstat)
+require(strinr)
 ```
 
 
 # Load Data
 ```{r}
-data_dir = "./data/"
-asthma_data = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"))
-places_data = read.csv(str_c(data_dir, "dc_cdc_places_tract_data.csv"))
-svi_data = read.csv(str_c(data_dir, "dc_cdc_svi.csv"))
+data_dir = "./data/astham_data"
+asthma_dc = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"))
+# asthma_md
+# asthma_va = read.csv(str_c())
+
+
 ```
 
 
-# Inspect Data
+# Load and Inspect Data
 
 ## Asthma Data
 
 ```{r}
-summary(asthma_data)
-```
-
-```{r}
-colnames(asthma_data)
-colnames(asthma_data) <- c(
+colnames(asthma_dc)
+drop_indices = c(18:22, 32, 33, 34, 37, 38)
+colnames(asthma_dc) <- c(
   "geoid",
   "name",
   "unw_cent_long",
   "unw_cent_lat",
-  "est_pop",
+  "est_population",
   "non_his",
   "white",
   "black",
@@ -60,8 +60,17 @@ colnames(asthma_data) <- c(
   "educated",
   "med_income",
   "below_pov",
-  "income_to_pov",
-  
+  "high_school",
+  "college",
+  "labor_participation",
+  "non_white",
+  "redlining",
+  "asthma_prev",
+  "smoking_prev",
+  "obesity_prev",
+  "copd_prev",
+  "particulate_matter",
+  "housing_stress"
 )
 ```
 
@@ -75,16 +84,60 @@ asthma = as_tibble(asthma_data)
 ## Places Data
 
 ```{r}
-summary(places_data)
-```
-
-```{r}
+places_data = read.csv(str_c(data_dir, "dc_md_va_places__census_tract_data.csv"))
 colnames(places_data)
-# colnames(places_data) <- c()
+places_features = c(
+  "StateAbbr",
+  "StateDesc",
+  "CountyName",
+  "TractFIPS",
+  "TotalPopulation",
+  "ACCESS2_CrudePrev",
+  "BINGE_CrudePrev",
+  "BPHIGH_CrudePrev",
+  "CANCER_CrudePrev",
+  "CASTHMA_CrudePrev",
+  "CHD_CrudePrev",
+  "CHECKUP_CrudePrev",
+  "COPD_CrudePrev",
+  "CSMOKING_CrudePrev",
+  "DIABETES_CrudePrev",
+  "HIGHCHOL_CrudePrev",
+  "LPA_CrudePrev",
+  "OBESITY_CrudePrev",
+  "SLEEP_CrudePrev",
+  "STROKE_CrudePrev",
+  "Geolocation"
+  )
+places_data = select(places_data, places_features)
+colnames(places_data) <- c(
+  "state_abbrev",
+  "state_desc", 
+  "county_name",
+  "tract_fips",
+  "total_population",
+  "lack_insurence_prev",
+  "binge_drinking_prev",
+  "high_bp_prev",
+  "cancer_prev",
+  "adult_asthma_prev",
+  "heart_disease_prev",
+  "routine_physical_prev",
+  "copd_prev",
+  "smoking_prev",
+  "diabetes_prev",
+  "high_chol_prev",
+  "physical_activity_prev",
+  "adult_obesity_prev",
+  "poor_sleep_prev",
+  "stroke_prev",
+  "geolocation"
+  )
 ```
 
 ```{r}
 places = as_tibble(places_data)
+write_csv(places, "cdc_places_data.csv")
 ```
 
 ### EDA Plotting
@@ -93,16 +146,53 @@ places = as_tibble(places_data)
 ## SVI Data
 
 ```{r}
-summary(svi_data)
-```
+svi_dc = read.csv(str_c(data_dir, "dc_cdc_svi.csv"))
+svi_md = read.csv(str_c(data_dir, "md_cdc_svi.csv"))
+svi_va = read.csv(str_c(data_dir, "va_cdc_svi.csv"))
 
-```{r}
+svi_data = rbind(svi_dc, svi_md, svi_va)
+
+index = c(1:8, (1:158)[str_detect(colnames(svi_data), "E_")])
+
+svi_data = svi_data[, index]
+svi_data = svi_data[, -(28:36)]
+
 colnames(svi_data)
-# colnames(svi_data) <- c()
+
+colnames(svi_data) <- c(
+  "state_fips",
+  "state_name",
+  "state_abbrev",
+  "county_fips",
+  "county_name",
+  "fips",
+  "location",
+  "area_sqmi",
+  "total_pop",
+  "housing_units",
+  "num_households",
+  "poverty",
+  "unemployment",
+  "housing_cost_burden",
+  "no_highschool",
+  "uninsured",
+  "age_over_65",
+  "age_under_17",
+  "disabilities",
+  "single_parent",
+  "limited_english",
+  "minority",
+  "multi_unit_housing",
+  "mobile_homes",
+  "crowded_housing",
+  "no_vehicle",
+  "group_quarters"
+)
 ```
 
 ```{r}
 svi = as_tibble(svi_data)
+write_csv(places, "cdc_svi_data.csv")
 ```
 
 
