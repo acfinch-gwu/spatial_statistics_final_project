@@ -1,0 +1,33 @@
+---
+title: "load_gdb_files"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+require(stringr)
+```
+
+```{r}
+gdb_list = list.files(path = "./data", pattern = ".gdb", full.names = T)
+flood_list = lapply(gdb_list, st_read,layer = 'S_FLD_HAZ_AR')
+```
+
+```{r}
+dmv = c("dc", "md", "va")
+for(i in 1:3){
+  st_write(flood_list[[i]], str_c(dmv[i], "_nfhl.shp"))
+}
+```

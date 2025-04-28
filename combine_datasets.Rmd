@@ -40,3 +40,9 @@ svi_asthma = full_join(svi, asthma, by = c("fips", "location"))
 places = places %>% rename(fips = tract_fips)
 full_data = full_join(svi, places, by = "fips")
 ```
+
+
+```{r}
+write_csv(full_data, "dmv_combined_data.csv")
+
+```
