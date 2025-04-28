@@ -30,6 +30,7 @@ data_dir = "./data/"
 ```
 
 ## Asthma Data
+
 ```{r}
 files_list = list.files("./data/asthma_equity_data", pattern = ".csv", full.names = T)
 dataframe_list = lapply(files_list, read.csv)
@@ -81,7 +82,7 @@ write_csv(asthma, "asthma_equity_data.csv")
 ## Places Data
 
 ```{r}
-places_data = read.csv(str_c(data_dir, "dc_md_va_places__census_tract_data.csv"))
+places_data = read.csv(str_c(data_dir, "dc_md_va_places_census_tract_data_2022.csv"))
 colnames(places_data)
 places_features = c(
   "StateAbbr",
@@ -189,3 +190,95 @@ svi = as_tibble(svi_data)
 write_csv(svi, "cdc_svi_data.csv")
 ```
 
+## EJI Data
+
+```{r}
+eji_files = list.files("./data", pattern = "eji", full.names = T)
+eji_data = lapply(eji_files, read_csv, show_col_types = F)
+eji_data = rbind(eji_data[[1]], eji_data[[2]], eji_data[[3]])
+
+index = str_detect(colnames(eji_data), "EPL_|RPL_|SPL_|M_|F_", negate = T)
+eji_data = eji_data[, index]
+
+colnames(eji_data)
+
+colnames(eji_data) <- c(
+  "state_fips",
+  "county_fips",
+  "tract_code",
+  "affgeoid",
+  "fips",
+  "name",
+  "county",
+  "state_abbrev",
+  "state",
+  "location",
+  "total_pop",
+  "daytime_pop",
+  "ozone",
+  "pm2.5",
+  "diesel",
+  "cancer_prob",
+  "npl_proximity",
+  "toxic_poximity",
+  "tsd_proximity",
+  "rmp_proximity",
+  "coal_proximity",
+  "lead_proximity",
+  "park_proximity",
+  "house_age",
+  "walkability",
+  "rail_proximity",
+  "road_proximity",
+  "airport_proximity",
+  "watershed_proximity",
+  "minority_per",
+  "poverty200",
+  "no_highschool",
+  "unemployment",
+  "renters",
+  "housbdn",
+  "uninsured",
+  "no_internet",
+  "age_over65",
+  "age_under17",
+  "disabilities",
+  "limited_english",
+  "mobile_homes",
+  "group_quarters",
+  "high_bp",
+  "asthma",
+  "cancer",
+  "poor_mental",
+  "diabetes"
+)
+```
+
+```{r}
+length(unique(eji_data$fips))
+```
+
+
+```{r}
+eji = as_tibble(select(eji_data, "state_fips":"watershed_proximity")) %>%
+  select(!c("state_fips", "county_fips", "tract_code", "name", "affgeoid", "county", "location"))
+
+eji <- eji %>%
+  group_by(fips) %>%
+  summarize(
+    # for every numeric column, take its mean (dropping NAs)
+    across(
+      where(is.numeric),
+      ~ mean(.x, na.rm = TRUE)
+    ),
+    # if you have any non-numeric columns you still want to keep,
+    # take the first value per group (or choose another summary fn)
+    across(
+      where(~ !is.numeric(.x)),
+      ~ first(.x)
+    ),
+    .groups = "drop"
+  )
+  
+write_csv(eji, "cdc_eji_data.csv")
+```

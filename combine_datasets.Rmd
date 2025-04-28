@@ -18,6 +18,7 @@ require(sp)
 require(INLA)
 require(gstat)
 require(stringr)
+require(tigris)
 ```
 
 ## Load datasets
@@ -26,23 +27,42 @@ require(stringr)
 places = as_tibble(read.csv("cdc_places_data.csv"))
 svi = as_tibble(read.csv("cdc_svi_data.csv"))
 asthma = as_tibble(read.csv("asthma_equity_data.csv"))
+eji = as_tibble(read.csv("cdc_eji_data.csv"))
 ```
 
 ```{r}
 head(places, 10)
 head(svi, 10)
 head(asthma, 10)
+head(eji, 10)
 ```
-
 
 ```{r}
 svi_asthma = full_join(svi, asthma, by = c("fips", "location"))
 places = places %>% rename(fips = tract_fips)
-full_data = full_join(svi, places, by = "fips")
+full_data = full_join(svi_asthma, places, by = "fips")
+full_data = full_join(full_data, eji, by = "fips")
 ```
-
 
 ```{r}
-write_csv(full_data, "dmv_combined_data.csv")
+colnames(full_data)
 
+dmv_data = as_tibble(full_data) %>%
+  select(!contains(".y")) %>%
+  select(!c("unw_cent_long", "unw_cent_lat", "state_desc", "state"))
+
+#  Load DC census tracts
+dc_tracts <- tracts(state = "DC", cb = TRUE, year = 2022)
+md_tracts <- tracts(state = "MD", cb = TRUE, year = 2022)
+va_tracts <- tracts(state = "VA", cb = TRUE, year = 2022)
+tracts = rbind(dc_tracts, md_tracts, va_tracts) %>% rename(fips = GEOID) %>% mutate(fips = as.double(fips)) %>% select(!c("STATEFP", "COUNTYFP", "TRACTCE", "AFFGEOID", "NAME", "NAMELSAD", "STUSPS", "NAMELSADCO", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
+
+dmv_data = left_join(dmv_data, tracts, by = "fips")
+
+ggplot(dmv_data, aes(geometry = geometry)) + geom_sf()
 ```
+
+```{r}
+write_csv(dmv_data, "dmv_combined_data.csv")
+```
+
