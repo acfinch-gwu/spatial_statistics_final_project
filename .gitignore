@@ -2,8 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-.dbf
-.prj
-.shp
-.shx
+shapefiles/
 data/*.gdb
