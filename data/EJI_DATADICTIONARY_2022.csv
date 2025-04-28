@@ -1,0 +1,159 @@
+"EJI Database Data Dictionary
+Variables beginning with “E_” are estimates. Variables beginning with “EPL_” are percentile ranks for those estimates. Variables beginning with “SPL_” are summed indicator or module ranks for domains, modules, or overall scores, and variables beginning with “RPL_” are percentile ranks for domains, modules or overall scores. Values of -999 represent “null” or “no data.” Census tract boundaries are taken from 2019 TIGER/ Line Files and are based on the 2010 decennial census.",,,,,,
+2022 VARIABLE NAME,2022 DESCRIPTION,MODULE,DOMAIN,DATA SOURCE,2022 TABLE FIELD CALCULATION,NOTES
+STATEFP,State fips code,No value,No value,No value,No value,No value
+COUNTYFP,County fips number,No value,No value,No value,No value,No value
+TRACTCE,Census tract code,No value,No value,"U.S. Census Bureau 2019 TIGER/ Line Files
+https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html",No value,No value
+AFFGEOID,"Census tract identifier; a concatenation of current state Federal Information Processing Series (FIPS) code, county FIPS code, and census tract code",No value,No value,No value,No value,No value
+GEOID,County identifier; a concatenation of current state Federal Information Processing Series (FIPS) code and county FIPS code,No value,No value,No value,No value,No value
+COUNTY,County names,No value,No value,No value,No value,No value
+StateAbbr,State abbreviations,No value,No value,No value,No value,No value
+StateDesc,Full state name,No value,No value,No value,No value,No value
+Location,"Text description of tract, county, state",No value,No value,No value,No value,No value
+E_TOTPOP,"Population estimate, 2014-2018 ACS",No value,No value,No value,No value,No value
+M_TOTPOP,"Population estimate MOE, 2014-2018 ACS",No value,No value,No value,No value,No value
+E_DAYPOP,"Adjunct variable - Estimated daytime population, LandScan 2018",No value,No value,No value,No value,No value
+SPL_EJI,"Summation of the HVM, EBI, and SVI module percentile ranks",No value,No value,No value,RPL_EBM + RPL_HVM + RPL_SVM,Tract with null values were not included in the sum.
+RPL_EJI,Percentile ranks of SPL_EJI,No value,No value,No value,In Excel: PERCENTRANK.INC on SPL_EJI array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SER,"Summation of the EB, and SV module percentile ranks",No value,No value,No value,RPL_EBM + RPL_SVM,Tract with null values were not included in the sum.
+RPL_SER,Percentile ranks of SPL_SER,No value,No value,No value,In Excel: PERCENTRANK.INC on SPL_SER array with 4 significant digits,Null values removed before calculating output rank.
+EP_MINRTY,Percentage of minority persons,SVM,SVM DOM1,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table B01001H - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_MINRTY,Percentile rank of percentage of minority persons,SVM,SVI DOM1,No value,In Excel: PERCENTRANK.INC on E_MINRTY array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SVM_DOM1,Domain consisting of percentage of individuals who are a racial/ethnic minority,SVM,SVI DOM1,No value,EPL_MINRTY,Tract with null values were not included in the sum.
+RPL_SVM_DOM1,Percentile rank of domain consisting of percentage of individuals who are a racial/ethnic minority,SVM,SVI DOM1,No value,In Excel: PERCENTRANK.INC on SPL_SVM_DOM1 array with 4 significant digits,Null values removed before calculating output rank.
+EP_POV200,Percentage below 200% poverty,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S1701 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_POV200,Percentile rank of percentage below 200% poverty,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_POV200 array with 4 significant digits,Null values removed before calculating output rank.
+EP_NOHSDP,Percentile Percentage of persons with no high school diploma (age 25+) estimate,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S0601 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_NOHSDP,Percentile rank of percentile Percentage of persons with no high school diploma (age 25+) estimate,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_NOHSDP array with 4 significant digits,Null values removed before calculating output rank.
+EP_UNEMP,Percentage of persons who are unemployed,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table DP03 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_UNEMP,Percentile rank of percentage of persons who are unemployed,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_UNEMP array with 4 significant digits,Null values removed before calculating output rank.
+EP_RENTER,Percentage of persons who rent,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S2502 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_RENTER,Percentile rank of percentage of persons who rent,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_RENTER array with 4 significant digits,Null values removed before calculating output rank.
+EP_HOUBDN,"Percentage of households that make less than 75,000",SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data -
+Table S2503 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_HOUBDN,"Percentile rank of percentage of households that make less than 75,000",SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_HOUBDN array with 4 significant digits,Null values removed before calculating output rank.
+EP_UNINSUR,Percentage of persons who are uninsured,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S2701 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_UNINSUR,Percentile rank of percentage of persons who are uninsured,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_UNINSUR array with 4 significant digits,Null values removed before calculating output rank.
+EP_NOINT,Percentage of persons without internet,SVM,SVM DOM2,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S2801 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_NOINT,Percentile rank of percentage of persons without internet,SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on E_NOINT array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SVM_DOM2,"Domain consisting of below 200% poverty, no high school diploma, unemployed, housing tenure, housing cost, no health insurance, and not internet",SVM,SVI DOM2,No value,EPL_POV200 + EPL_NOHSDP + EPL_UNEMP + EPL_RENTER + EPL_HOUBDN + EPL_UNINSUR + EPL_NOINT,Tract with null values were not included in the sum.
+RPL_SVM_DOM2,"Percentile rank of domain consisting of below 200% poverty, no high school diploma, unemployed, housing tenure, housing cost, no health insurance, and not internet",SVM,SVI DOM2,No value,In Excel: PERCENTRANK.INC on SPL_SVM_DOM2 array with 4 significant digits,Null values removed before calculating output rank.
+EP_AGE65,"Persons aged 65 and older estimate MOE, 2014-2018 ACS",SVM,SVM DOM3,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table S0101 -
+ https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_AGE65,Percentile rank of percentage of persons aged 65 and older estimate,SVM,SVI DOM3,No value,In Excel: PERCENTRANK.INC on E_AGE65 array with 4 significant digits,Null values removed before calculating output rank.
+EP_AGE17,"Persons aged 17 and younger estimate, 2014-2018 ACS",SVM,SVM DOM3,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table B09001 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_AGE17,Percentile rank of percentage of persons aged 17 and younger estimate,SVM,SVI DOM3,No value,In Excel: PERCENTRANK.INC on E_AGE17 array with 4 significant digits,Null values removed before calculating output rank.
+EP_DISABL,"Percentage of civilian noninstitutionalized population with a disability estimate, 2014-2018 ACS",SVM,SVM DOM3,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table DP02 -
+ https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_DISABL,Percentile rank of percentage of civilian noninstitutionalized population with a disability estimate,SVM,SVI DOM3,No value,In Excel: PERCENTRANK.INC on E_DISABL array with 4 significant digits,Null values removed before calculating output rank.
+EP_LIMENG,"Percentage of persons (age 5+) who speak English ""less than well"" estimate, 2014-2018 ACS",SVM,SVM DOM3,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table B16005 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_LIMENG,"Percentile rank of percentage of persons (age 5+) who speak English ""less than well"" estimate, 2014-2018 ACS",SVM,SVI DOM3,No value,In Excel: PERCENTRANK.INC on E_LIMENG array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SVM_DOM3,"Domain consisting of English language proficiency, aged 65 or older, aged 17 or younger, and civilian with a disability",SVM,SVI DOM3,No value,EPL_AGE65 + EPL_AGE17 + EPL_DISABL + EPL_LIMENG,Tract with null values were not included in the sum.
+RPL_SVM_DOM3,"Percentile rank of domain consisting of English language proficiency, aged 65 or older, aged 17 or younger, and civilian with a disability",SVM,SVI DOM3,No value,In Excel: PERCENTRANK.INC on SPL_SVM_DOM3 array with 4 significant digits,Null values removed before calculating output rank.
+EP_MOBILE,Percentage of mobile homes estimate,SVM,SVM DOM4,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table DP04 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_MOBILE,Percentile rank of percentage of mobile homes estimate,SVM,SVI DOM4,No value,In Excel: PERCENTRANK.INC on E_MOBILE array with 4 significant digits,Null values removed before calculating output rank.
+EP_GROUPQ,"Percentage of persons in group quarters estimate, 2014-2018 ACS",SVM,SVM DOM4,"2015-2019 Census Bureau American Community Survey (ACS) 5-year Data - 
+Table B26001 - 
+https://www.census.gov/data/developers/data-sets/acs-5year.html",No value,No value
+EPL_GROUPQ,"Percentile rank of percentage of persons in group quarters estimate, 2014-2018 ACS",SVM,SVI DOM4,No value,In Excel: PERCENTRANK.INC on E_GROUPQ array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SVM_DOM4,Domain consisting of number of mobile homes and housing with group quarters,SVM,SVI DOM4,No value,EPL_MOBILE + EPL_GROUPQ,Tract with null values
+RPL_SVM_DOM4,Percentile rank of domain consisting of number of mobile homes and housing with group quarters,SVM,SVI DOM4,No value,In Excel: PERCENTRANK.INC on SPL_SVM_DOM4 array with 4 significant digits,Null values removed before calculating output rank.
+SPL_SVM,No value,SVM,No value,No value,EPL_MINRTY + EPL_RENTER + EPL_HOUBDN + EPL_UNINSUR EPL_NOINT + EPL_AGE65 + EPL_AGE17 + EPL_DISABL + EPL_LIMENG + EPL_MOBILE + EPL_GROUPQ,Tract with null values were not included in the sum.
+RPL_SVM,Social vulnerability module percentile rank,SVM,No value,No value,In Excel: PERCENTRANK.INC on SPL_SVM array with 4 significant digits,Null values removed before calculating output rank.
+E_OZONE,Annual mean days above O3 regulatory standard - 3-year average,EBM,EBM DOM1,"2014-2016 U.S. EPA Air Quality System (AQS) as available through the CDC’s National Environmental Health Tracking Network
+https://ephtracking.cdc.gov/indicatorPages",No value,No value
+EPL_OZONE,Percentile rank of annual mean days above O3 regulatory standard - 3-year average,EBM,EBM DOM1,No value,In Excel: PERCENTRANK.INC on E_OZONE array with 4 significant digits,Null values removed before calculating output rank.
+E_PM,Annual mean days above PM2.5 regulatory standard - 3-year average,EBM,EBM DOM1,"2014-2016 U.S. EPA Air Quality System (AQS) as available through the CDC’s National Environmental Health Tracking Network
+https://ephtracking.cdc.gov/indicatorPages",No value,No value
+EPL_PM,Percentile rank of annual mean days above PM2.5 regulatory standard - 3-year average,EBM,EBM DOM1,No value,In Excel: PERCENTRANK.INC on E_PM array with 4 significant digits,Null values removed before calculating output rank.
+E_DSLPM,Ambient concentrations of diesel PM/m3,EBM,EBM DOM1,"2014 U.S. EPA National Air Toxics Assessment (NATA) -
+https://www.epa.gov/national-air-toxics-assessment/2014-nata-assessment-results#modeled",No value,No value
+EPL_DSLPM,Percentile rank of ambient concentrations of diesel PM/m3,EBM,EBM DOM1,No value,In Excel: PERCENTRANK.INC on E_DSLPM array with 4 significant digits,Null values removed before calculating output rank.
+E_TOTCR,"The probability of contracting cancer over the course of a lifetime, assuming continuous exposure",EBM,EBM DOM1,"2014 U.S. EPA National Air Toxics Assessment (NATA) - 
+https://www.epa.gov/national-air-toxics-assessment/2014-nata-assessment-results#modeled",No value,No value
+EPL_TOTCR,"Percentile rank of the probability of contracting cancer over the course of a lifetime, assuming continuous exposure",EBM,EBM DOM1,No value,In Excel: PERCENTRANK.INC on E_TOTCR array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM_THEME1,"Domain consisting of ozone, PM2.5, air toxics cancer risk, and diesel particulate matter.",EBM,EBM DOM1,No value,EPL_OZONE + EPL_PM + EPL_DSLPM + EPL_TOTCR,Tract with null values were not included in the sum.
+RPL_EBM_DOM1,"Percentile rank of domain consisting of ozone, PM2.5, air toxics cancer risk, and diesel particulate matter.",EBM,EBM DOM1,No value,In Excel: PERCENTRANK.INC on SPL_EBM_THEME1 array with 4 significant digits,Null values removed before calculating output rank.
+E_NPL,Proportion of tract's area within 1-mi buffer of EPA National Priority List site,EBM,EBM DOM2,https://www.epa.gov/frs/geospatial-data-download-service,No value,No value
+EPL_NPL,Percentile rank of proportion of tract's area within 1-mi buffer of EPA National Priority List site,EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_NPL array with 4 significant digits,Null values removed before calculating output rank.
+E_TRI,Proportion of tract's area within 1-mi buffer of EPA Toxic Release Inventory site,EBM,EBM DOM2,https://www.epa.gov/frs/geospatial-data-download-service,No value,No value
+EPL_TRI,Percentile rank of proportion of tract's area within 1-mi buffer of EPA Toxic Release Inventory site,EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_TRI array with 4 significant digits,Null values removed before calculating output rank.
+E_TSD,"Proportion of tract's area within 1-mi buffer of EPA Treatment, Storage, and Disposal site",EBM,EBM DOM2,https://www.epa.gov/frs/geospatial-data-download-service,No value,No value
+EPL_TSD,"Percentile rank of proportion of tract's area within 1-mi buffer of EPA Treatment, Storage, and Disposal site",EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_TSD array with 4 significant digits,Null values removed before calculating output rank.
+E_RMP,Proportion of tract's area within 1-mi buffer of EPA risk management plan site,EBM,EBM DOM2,https://www.epa.gov/frs/geospatial-data-download-service,No value,No value
+EPL_RMP,Percentile rank of proportion of tract's area within 1-mi buffer of EPA risk management plan site,EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_RMP array with 4 significant digits,Null values removed before calculating output rank.
+E_COAL,Proportion of tract's area within 1-mi buffer of coal mines,EBM,EBM DOM2,U.S. Mine Safety and Health Administration Mine Data Retrieval System (MDRS),No value,No value
+EPL_COAL,Percentile rank of proportion of tract's area within 1-mi buffer of coal mines,EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_COAL array with 4 significant digits,Null values removed before calculating output rank.
+E_LEAD,Proportion of tract's area within 1-mi buffer of lead mines,EBM,EBM DOM2,U.S. Mine Safety and Health Administration Mine Data Retrieval System (MDRS),No value,No value
+EPL_LEAD,Percentile rank of proportion of tract's area within 1-mi buffer of lead mines,EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on E_LEAD array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM_THEME2,"Domain consisting of proximity to national priority list sites, proximity to release inventory sites, proximity to treatment, storage, and disposal sites, proximity to risk management plan sites, proximity to coal mines, and proximity to lead mines",EBM,EBM DOM2,No value,EPL_NPL + EPL_TRI + EPL_TSD + EPL_RMP + EPL_COAL + EPL_LEAD,Tract with null values were not included in the sum.
+RPL_EBM_DOM2,"Percentile rank of domain consisting of proximity to national priority list sites, proximity to release inventory sites, proximity to treatment, storage, and disposal sites, proximity to risk management plan sites, proximity to coal mines, and proximity to lead mines",EBM,EBM DOM2,No value,In Excel: PERCENTRANK.INC on SPL_EBM_THEME2 array with 4 significant digits,Null values removed before calculating output rank.
+E_PARK,Proportion of tract's area within 1-mi buffer of green space,EBM,EBM DOM3,2020 TomTom MultiNet® Enterprise Dataset,No value,No value
+EPL_PARK,Percentile rank of proportion of tract's area within 1-mi buffer of green space,EBM,EBM DOM3,No value,In Excel: PERCENTRANK.INC on E_PARK array with 4 significant digits,Null values removed before calculating output rank.
+E_HOUAGE,Percentage of houses built pre-1980 (lead exposure),EBM,EBM DOM3,No value,No value,No value
+EPL_HOUAGE,Percentile rank of percentage of houses built pre-1980 (lead exposure),EBM,EBM DOM3,No value,In Excel: PERCENTRANK.INC on E_HOUSAGE array with 4 significant digits,Null values removed before calculating output rank.
+E_WLKIND,A nationwide geographic data resource that ranks block groups according to their relative walkability,EBM,EBM DOM3,2021 U.S. EPA National Walkability Index - https://edg.epa.gov/metadata/catalog/search/resource/details.page?uuid=%7B251AFDD9-23A7-4068-9B27-A3048A7E6012%7D,No value,No value
+EPL_WLKIND,Percentile rank of a nationwide geographic data resource that ranks block groups according to their relative walkability,EBM,EBM DOM3,No value,In Excel: PERCENTRANK.INC on E_WLKIND array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM_THEME3,"Domain consisting of proximity to recreational parks, houses built pre-1980 (lead exposure), and walkability index",EBM,EBM DOM3,No value,EPL_PARK + EPL_HOUAGE + EPL_WLKIND,Tract with null values were not included in the sum.
+RPL_EBM_DOM3,"Percentile rank of domain consisting of proximity to recreational parks, houses built pre-1980 (lead exposure), and walkability index",EBM,EBM DOM3,No value,In Excel: PERCENTRANK.INC on SPL_EBM_THEME3 array with 4 significant digits,Null values removed before calculating output rank.
+E_RAIL,Proportion of tract's area within 1-mi buffer of railroad,EBM,EBM DOM4,2020 TomTom MultiNet® Enterprise Dataset,No value,No value
+EPL_RAIL,Percentile rank of proportion of tract's area within 1-mi buffer of railroad,EBM,EBM DOM4,No value,In Excel: PERCENTRANK.INC on E_RAIL array with 4 significant digits,Null values removed before calculating output rank.
+E_ROAD,Proportion of tract's area within 1-mi buffer of high-volume road or highway,EBM,EBM DOM4,2020 TomTom MultiNet® Enterprise Dataset,No value,No value
+EPL_ROAD,Percentile rank of proportion of tract's area within 1-mi buffer of high-volume road or highway,EBM,EBM DOM4,No value,In Excel: PERCENTRANK.INC on E_ROAD array with 4 significant digits,Null values removed before calculating output rank.
+E_AIRPRT,Proportion of tract's area within 1-mi buffer of airport,EBM,EBM DOM4,2020 TomTom MultiNet® Enterprise Dataset,No value,No value
+EPL_AIRPRT,Percentile rank of proportion of tract's area within 1-mi buffer of airport,EBM,EBM DOM4,No value,In Excel: PERCENTRANK.INC on E_AIRPRT array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM_THEME4,"Domain consisting of proximity to high volume roads, proximity to railways, and proximity to airports",EBM,EBM DOM4,No value,EPL_RAIL + EPL_ROAD + EPL_AIRPRT,Tract with null values were not included in the sum.
+RPL_EBM_DOM4,"Percentile rank of domain consisting of proximity to high volume roads, proximity to railways, and proximity to airports",EBM,EBM DOM4,No value,In Excel: PERCENTRANK.INC on SPL_EBM_THEME4 array with 4 significant digits,Null values removed before calculating output rank.
+E_IMPWTR,Percent of tract that intersects an impaired/impacted watershed at the HUC12 level,EBM,EBM DOM5,"2022 U.S. EPA Watershed Index Online (WSIO) Tool - 
+https://www.epa.gov/wsio/download-and-use-wsio-tool",No value,No value
+EPL_IMPWTR,Percentile rank of percent of tract that intersects an impaired/impacted watershed at the HUC12 level,EBM,EBM DOM5,No value,In Excel: PERCENTRANK.INC on E_IMPWTR array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM_THEME5,Domain consisting of impaired water bodies,EBM,EBM DOM5,No value,EPL_IMPWTR,Tract with null values were not included in the sum.
+RPL_EBM_DOM5,Percentile rank of domain consisting of impaired water bodies,EBM,EBM DOM5,No value,In Excel: PERCENTRANK.INC on RPL_EBM_THEME5 array with 4 significant digits,Null values removed before calculating output rank.
+SPL_EBM,No value,EBM,No value,No value,EPL_OZONE + EPL_PM + EPL_DSLPM + EPL_TOTCR + EPL_NPL + EPL_TRI + EPL_TSD + EPL_RMP + EPL_COAL + EPL_LEAD + EPL_PARK + EPL_HOUAGE + EPL_WLKIND + EPL_RAIL + EPL_ROAD + EPL_AIRPRT + EPL_IMPWTR,Tract with null values were not included in the sum.
+RPL_EBM,The environmental burden module percentile ranks,EBM,No value,No value,In Excel: PERCENTRANK.INC on SPL_EBM array with 4 significant digits,Null values removed before calculating output rank.
+EP_BPHIGH,Percentage of individuals with Raw high blood pressures values,HVM,HVM DOM,"2020 CDC PLACES Data - 
+https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2020-/ib3w-k9rq",No value,No value
+EPL_BPHIGH,Percentile rank of percentage of individuals with Raw high blood pressures values,HVM,HVM DOM,No value,In Excel: PERCENTRANK.INC on EP_BPHIGH array with 4 significant digits,Null values removed before calculating output rank.
+F_BPHIGH,Flag indicating tracts greater than 0.6666 percentile rank with high blood pressure,HVM,HVM DOM,No value,EPL_BPHIGH > 0.6666,No value
+EP_ASTHMA,Percentage of individuals with asthma,HVM,HVM DOM,"2020 CDC PLACES Data - 
+https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2020-/ib3w-k9rq",No value,No value
+EPL_ASTHMA,Percentile rank of percentage of individuals with asthma,HVM,HVM DOM,No value,In Excel: PERCENTRANK.INC on EP_ASTHMA array with 4 significant digits,Null values removed before calculating output rank.
+F_ASTHMA,Flag indicating tracts greater than 0.6666 percentile rank with asthma,HVM,HVM DOM,No value,EPL_ASTHMA > 0.6666,No value
+EP_CANCER,Percentage of individuals with cancer,HVM,HVM DOM,"2020 CDC PLACES Data - 
+https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2020-/ib3w-k9rq",No value,No value
+EPL_CANCER,Percentile rank of percentage of persons with cancer,HVM,HVM DOM,No value,In Excel: PERCENTRANK.INC on EP_CANCER array with 4 significant digits,Null values removed before calculating output rank.
+F_CANCER,Flag indicating tracts greater than 0.6666 percentile rank with cancer,HVM,HVM DOM,No value,EPL_CANCER > 0.6666,No value
+EP_MHLTH,Percentage of individual reporting not good mental health,HVM,HVM DOM,"2020 CDC PLACES Data - 
+https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2020-/ib3w-k9rq",No value,No value
+EPL_MHLTH,Percentage of individual reporting not good mental health percentile rank,HVM,HVM DOM,No value,In Excel: PERCENTRANK.INC on EP_MHLTH array with 4 significant digits,Null values removed before
+F_MHLTH,Flag indicating tracts greater than 0.6666 percentile rank with not good mental health,HVM,HVM DOM,No value,EPL_MHLTH > 0.6666,No value
+EP_DIABETES,Percentage of individuals with diabetes,HVM,HVM DOM,"2020 CDC PLACES Data - 
+https://chronicdata.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2020-/ib3w-k9rq",No value,No value
+F_DIABETES,Flag indicating tracts greater than 0.6666 percentile rank with diabetes,HVM,HVM DOM,No value,EPL_DIABETES > 0.6666,No value
+EPL_DIABETES,Percentile rank of percentage of individuals with diabetes,HVM,HVM DOM,No value,In Excel: PERCENTRANK.INC on EP_DIABETES array with 4 significant digits,Null values removed before calculating output rank.
+RPL_HVM,Percentile rank of combined tertile flags,HVM,No value,No value,F_HVM * 0.2,No value
+F_HVM,Total number of tertile flags (>0.6666),HVM,HVM DOM,No value,F_BPHIGH + F_ASTHMA + F_CANCER + F_MHLTH + F_DIABETES,Tract with null values were not included in the sum.
