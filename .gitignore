@@ -2,8 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
-data/*.gdb
 .dbf
 .prj
 .shp
 .shx
+data/*.gdb
