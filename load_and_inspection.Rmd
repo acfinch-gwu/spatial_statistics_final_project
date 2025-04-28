@@ -26,12 +26,28 @@ require(strinr)
 
 # Load Data
 ```{r}
-data_dir = "./data/astham_data"
-asthma_dc = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"))
-# asthma_md
-# asthma_va = read.csv(str_c())
+require(NFHL)
+nfhl_meta
 
 
+# Define the bbox values
+xmin <- -83.6751
+ymin <-  36.5407
+xmax <- -75.0489
+ymax <-  39.7230
+
+# Create an 'st_bbox' and then convert to an sf POLYGON
+dmv_bbox <- st_bbox(c(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax),
+                    crs = st_crs(4326))
+
+# as sfc (simple feature geometry list)
+dmv_sfc  <- st_as_sfc(dmv_bbox)
+
+# wrap in an sf object
+dmv_sf   <- st_sf(geometry = dmv_sfc) |> st_buffer(0.01)
+
+
+nfhl_get(AOI = dmv_sf, layer = 28)
 ```
 
 
@@ -40,7 +56,7 @@ asthma_dc = read.csv(str_c(data_dir, "dc_census_tracts_asthma_equity_data.csv"))
 ## Asthma Data
 
 ```{r}
-colnames(asthma_dc)
+# colnames(asthma_dc)
 drop_indices = c(18:22, 32, 33, 34, 37, 38)
 colnames(asthma_dc) <- c(
   "geoid",
@@ -76,10 +92,8 @@ colnames(asthma_dc) <- c(
 
 ```{r}
 asthma = as_tibble(asthma_data)
+write_csv(asthma, "asthma_equity_data.csv")
 ```
-
-### EDA Plotting
-
 
 ## Places Data
 
@@ -139,9 +153,6 @@ colnames(places_data) <- c(
 places = as_tibble(places_data)
 write_csv(places, "cdc_places_data.csv")
 ```
-
-### EDA Plotting
-
 
 ## SVI Data
 
