@@ -20,47 +20,30 @@ require(sphet)
 require(sp)
 require(INLA)
 require(gstat)
-require(strinr)
+require(stringr)
 ```
-
-
-# Load Data
-```{r}
-require(NFHL)
-nfhl_meta
-
-
-# Define the bbox values
-xmin <- -83.6751
-ymin <-  36.5407
-xmax <- -75.0489
-ymax <-  39.7230
-
-# Create an 'st_bbox' and then convert to an sf POLYGON
-dmv_bbox <- st_bbox(c(xmin = xmin, ymin = ymin, xmax = xmax, ymax = ymax),
-                    crs = st_crs(4326))
-
-# as sfc (simple feature geometry list)
-dmv_sfc  <- st_as_sfc(dmv_bbox)
-
-# wrap in an sf object
-dmv_sf   <- st_sf(geometry = dmv_sfc) |> st_buffer(0.01)
-
-
-nfhl_get(AOI = dmv_sf, layer = 28)
-```
-
 
 # Load and Inspect Data
 
-## Asthma Data
-
 ```{r}
-# colnames(asthma_dc)
+data_dir = "./data/"
+```
+
+## Asthma Data
+```{r}
+files_list = list.files("./data/asthma_equity_data", pattern = ".csv", full.names = T)
+dataframe_list = lapply(files_list, read.csv)
+asthma_data = dataframe_list[[1]]
+for (i in 2:(length(dataframe_list))) {
+  asthma_data = rbind(asthma_data, dataframe_list[[i]])
+}
+
+colnames(asthma_data)
 drop_indices = c(18:22, 32, 33, 34, 37, 38)
-colnames(asthma_dc) <- c(
-  "geoid",
-  "name",
+asthma_data = asthma_data[, -drop_indices]
+colnames(asthma_data) <- c(
+  "fips",
+  "location",
   "unw_cent_long",
   "unw_cent_lat",
   "est_population",
@@ -203,8 +186,6 @@ colnames(svi_data) <- c(
 
 ```{r}
 svi = as_tibble(svi_data)
-write_csv(places, "cdc_svi_data.csv")
+write_csv(svi, "cdc_svi_data.csv")
 ```
-
-
 

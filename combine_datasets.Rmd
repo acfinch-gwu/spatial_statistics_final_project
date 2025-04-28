@@ -1,0 +1,42 @@
+---
+title: "combine dataframes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+require(stringr)
+```
+
+## Load datasets
+
+```{r}
+places = as_tibble(read.csv("cdc_places_data.csv"))
+svi = as_tibble(read.csv("cdc_svi_data.csv"))
+asthma = as_tibble(read.csv("asthma_equity_data.csv"))
+```
+
+```{r}
+head(places, 10)
+head(svi, 10)
+head(asthma, 10)
+```
+
+
+```{r}
+svi_asthma = full_join(svi, asthma, by = c("fips", "location"))
+places = places %>% rename(fips = tract_fips)
+full_data = full_join(svi, places, by = "fips")
+```
