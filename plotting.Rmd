@@ -1,0 +1,93 @@
+---
+title: "plotting"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(readr)
+require(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+require(stringr)
+require(tigris)
+```
+
+```{r}
+dmv_data = read_csv("dmv_combined_data.csv")
+dmv_flood_risk = read_csv("dmv_flood_risk_percent.csv")
+```
+
+```{r}
+head(dmv_data, 10)
+head(dmv_flood_risk, 10)
+```
+
+## Data Summaries
+
+```{r}
+summary(dmv_data)
+```
+
+```{r}
+summary(dmv_flood_risk)
+```
+
+## Geographic Plots
+
+```{r}
+dmv_flood_risk = dmv_flood_risk %>% rename(fips = GEOID)
+dmv_data = dmv_data %>% select(!c("geometry"))
+dmv = full_join(dmv_data, dmv_flood_risk, by = "fips")
+
+dc_tracts <- tracts(state = "DC", cb = TRUE, year = 2022)
+md_tracts <- tracts(state = "MD", cb = TRUE, year = 2022)
+va_tracts <- tracts(state = "VA", cb = TRUE, year = 2022)
+tracts = rbind(dc_tracts, md_tracts, va_tracts) %>% rename(fips = GEOID) %>% mutate(fips = as.double(fips)) %>% select(!c("STATEFP", "COUNTYFP", "TRACTCE", "AFFGEOID", "NAME", "NAMELSAD", "STUSPS", "NAMELSADCO", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
+
+dmv = left_join(dmv, tracts, by = "fips")
+```
+
+
+```{r}
+ggplot(dmv, aes(geometry = geometry, fill = percent_in_flood_zone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+
+ggplot(dmv, aes(geometry = geometry, fill = particulate_matter)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+
+ggplot(dmv, aes(geometry = geometry, fill = asthma_prev)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+
+ggplot(dmv, aes(geometry = geometry, fill = pm2.5)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+```
+
+```{r}
+# Load FEMA flood hazard shapefiles (already filtered for SFHA_TF == "T")
+dc_flood = st_read("shapefiles/dc_nfhl.shp") %>% filter(SFHA_TF == "T")
+md_flood = st_read("shapefiles/md_nfhl.shp") %>% filter(SFHA_TF == "T")
+va_flood = st_read("shapefiles/va_nfhl.shp") %>% filter(SFHA_TF == "T")
+
+# Merge all flood hazard areas
+all_flood = bind_rows(dc_flood, md_flood, va_flood)
+```
+
+```{r}
+ggplot(data = NULL) + 
+  geom_sf(data = dmv, aes(geometry = geometry)) + 
+  geom_sf(data = all_flood, aes(geometry = geometry, fill = as.factor(FLD_ZON))) + 
+  scale_color_viridis_d() + 
+  coord_sf()
+
+```
+
+
+
+
+
