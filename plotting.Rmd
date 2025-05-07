@@ -23,8 +23,8 @@ require(tigris)
 ```
 
 ```{r}
-dmv_data = read_csv("dmv_combined_data.csv")
-dmv_flood_risk = read_csv("dmv_flood_risk_percent.csv")
+dmv_data = read_csv("./data/dmv_combined_data.csv")
+dmv_flood_risk = read_csv("./data/dmv_flood_risk_percent.csv")
 ```
 
 ```{r}
@@ -174,25 +174,29 @@ dmv = left_join(dmv, tracts, by = "fips")
 
 ggplot(dmv, aes(geometry = geometry, fill = no_highschool)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "No High-School Diploma", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-poverty_plot = ggplot(dmv, aes(geometry = geometry, fill = poverty)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Poverty Rate", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+poverty_plot = ggplot(dmv, aes(geometry = geometry, fill = sqrt(poverty))) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Number Under 150% Poverty", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Sqrt Number") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("poverty_plot.png", plot = poverty_plot)
+ggsave("./plots/poverty_plot.png", plot = poverty_plot)
 
 unemployment_plot = ggplot(dmv, aes(geometry = geometry, fill = unemployment)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Unemployment Rate", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("unemployment_plot.png", plot = unemployment_plot)
+ggsave("./plots/unemployment_plot.png", plot = unemployment_plot)
 
 nonwhite_plot = ggplot(dmv, aes(geometry = geometry, fill = non_white)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Non-White Percentage", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Percentage") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("nonwhite_plot.png", plot = nonwhite_plot)
+ggsave("./plots/nonwhite_plot.png", plot = nonwhite_plot)
+
+nonwhite_plot = ggplot(dmv, aes(geometry = geometry, fill = sqrt(black))) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Black Percentage", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Sqrt Percentage") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("./plots/black_plot.png", plot = nonwhite_plot)
 
 minority_plot = ggplot(dmv, aes(geometry = geometry, fill = minority)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Minority Prevalence", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("minority_plot.png", plot = minority_plot)
+ggsave("./plots/minority_plot.png", plot = minority_plot)
 
-income_plot = ggplot(dmv, aes(geometry = geometry, fill = med_income)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Median Household Income", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Income") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+income_plot = ggplot(dmv, aes(geometry = geometry, fill = sqrt(med_income))) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Median Household Income", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Sqrt Median Income") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("income_plot.png", plot = income_plot)
+ggsave("./plots/income_plot.png", plot = income_plot)
 
 ggplot(dmv, aes(geometry = geometry, fill = est_population)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Estimated Population", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Population") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
@@ -200,22 +204,38 @@ ggplot(dmv, aes(geometry = geometry, fill = est_population)) + geom_sf(col = NA)
 
 flood_plot = ggplot(dmv, aes(geometry = geometry, fill = percent_in_flood_zone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Percent in Flood Zone", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Percent") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("flood_plot.png", plot = flood_plot)
+ggsave("./plots/flood_plot.png", plot = flood_plot)
 
 pm25_plot = ggplot(dmv, aes(geometry = geometry, fill = pm2.5)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "PM2.5 Burden", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Mean Days Above Standard") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("pm25_plot.png", plot = pm25_plot)
+ggsave("./plots/pm25_plot.png", plot = pm25_plot)
 
 ozone_plot = ggplot(dmv, aes(geometry = geometry, fill = ozone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Ozone Burden", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Mean Days Above Standard") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("ozone_plot.png", plot = ozone_plot)
+ggsave("./plots/ozone_plot.png", plot = ozone_plot)
 
-ggplot(dmv, aes(geometry = geometry, fill = particulate_matter)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Particulate Matter", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Concentration") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+particle_plot = ggplot(dmv, aes(geometry = geometry, fill = particulate_matter)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Particulate Matter", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Concentration") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("./plots/particule_plot.png", plot = particle_plot)
 ```
+
+```{r}
+road_plot = ggplot(dmv, aes(geometry = geometry, fill = road_proximity)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Proportion within 1-Mile\nBuffer of Roads/Highways", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Proportion") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("./plots/road_plot.png", plot = road_plot)
+
+rail_plot = ggplot(dmv, aes(geometry = geometry, fill = rail_proximity)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Proportion within 1-Mile\nBuffer of Railways", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Proportion") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("./plots/rail_plot.png", plot = rail_plot)
+
+airport_plot = ggplot(dmv, aes(geometry = geometry, fill = airport_proximity)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Proportion within 1-Mile\nBuffer of Airports", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Proportion") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("./plots/airport_plot.png", plot = airport_plot)
+```
+
 
 ```{r}
 asthma_plot = ggplot(dmv, aes(geometry = geometry, fill = asthma_prev)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Prevalence", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggsave("asthma_plot.png", plot = asthma_plot)
-
+ggsave("./plots/asthma_plot.png", plot = asthma_plot)
 ```
