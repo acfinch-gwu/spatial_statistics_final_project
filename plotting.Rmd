@@ -42,6 +42,117 @@ summary(dmv_data)
 summary(dmv_flood_risk)
 ```
 
+## Distribution Plots
+
+```{r, warning = F}
+## Demographic Plots
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = black), bins = 35,  stat = "bin", fill = "deepskyblue") + 
+  labs(title = "Histogram of Black", y = "Count", x = "Percentage Black")
+  
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = white), bins = 35,  stat = "bin", fill = "deepskyblue") + 
+  labs(title = "Histogram of White", y = "Count", x = "Percentage White")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = total_population), bins = 35,  stat = "bin", fill = "deepskyblue") + 
+  labs(title = "Histogram of Total Population", y = "Count", x = "Total Population")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = num_households), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Number of Households", y = "Count", x = "Number of Households")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = total_population), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Total Population", y = "Count", x = "Total Population")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = med_income), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Median Income", y = "Count", x = "Median Income")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = smoking_prev.x), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Smoking Prevalence", y = "Count", x = "Smoking Prevalence")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = adult_asthma_prev), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Adult Asthma Prevalence", y = "Count", x = "Adult Asthma Prevalence")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = physical_activity_prev), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Physical Activity Prevalence", y = "Count", x = "Physical Activity Prevalence")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = poverty), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of\nBelow 150% Poverty", y = "Count", x = "Number Below 150% Poverty")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = adult_obesity_prev), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Adult Obesity Prevalence", y = "Count", x = "Adult Obesity Prevalence")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = uninsured), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Number Uninsured", y = "Count", x = "Number Uninsured")
+
+## Environmental Plots
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = particulate_matter), bins = 35,  stat = "bin", fill = "forestgreen") + 
+  labs(title = "Histogram of Particulate Matter", y = "Count", x = "Particulate Matter")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = ozone), bins = 35,  stat = "bin", fill = "forestgreen") + 
+  labs(title = "Histogram of Mean Days\nAbove O_3 Standard", y = "Count", x = "Mean Days\nAbove O_3 Standard")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = pm2.5), bins = 35,  stat = "bin", fill = "forestgreen") + 
+  labs(title = "Histogram of Mean Days\nAbove PM2.5 Standard", y = "Count", x = "Mean Days\nAbove PM2.5 Standard")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = watershed_proximity), bins = 35,  stat = "bin", fill = "darkorchid") + 
+  labs(title = "Histogram of Watershed Proximity", y = "Count", x = "Percentage Insecting Impacted Watershed")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = road_proximity), bins = 35,  stat = "bin", fill = "darkorchid") + 
+  labs(title = "Histogram of Road Proximity", y = "Count", x = "Proportion within 1-Mile\nBuffer of Roads/Highways")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = rail_proximity), bins = 35,  stat = "bin", fill = "darkorchid") + 
+  labs(title = "Histogram of Railway Proximity", y = "Count", x = "Proportion within 1-Mile\nBuffer of Railways")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = airport_proximity), bins = 35,  stat = "bin", fill = "darkorchid") + 
+  labs(title = "Histogram of Airport Proximity", y = "Count", x = "Proportion within 1-Mile\nBuffer of Airport")
+```
+
+
+```{r, warning = F}
+## Asthma plots
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = asthma_prev), bins = 35,  stat = "bin", fill = "firebrick") + 
+  labs(title = "Histogram of Asthma Prevalence", y = "Count", x = "Asthma Prevalence")
+```
+
+## Transformation Analysis
+
+```{r, warning = F}
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = sqrt(black)), bins = 35,  stat = "bin", fill = "deepskyblue") + 
+  labs(title = "Histogram of Black", sub = 
+         "Transformed", y = "Count", x = "Percentage Black")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = sqrt(med_income)), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of Median Income", sub = 
+         "Transformed", y = "Count", x = "Median Income")
+
+ggplot(data = dmv_data) + 
+  geom_histogram(aes(x = sqrt(poverty)), bins = 35,  stat = "bin", fill = "goldenrod") + 
+  labs(title = "Histogram of\nBelow 150% Poverty", sub = 
+         "Transformed", y = "Count", x = "Number Below 150% Poverty")
+
+```
+
+
 ## Geographic Plots
 
 ```{r}
@@ -59,35 +170,52 @@ dmv = left_join(dmv, tracts, by = "fips")
 
 
 ```{r}
-ggplot(dmv, aes(geometry = geometry, fill = percent_in_flood_zone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+## Demographic Variables
 
-ggplot(dmv, aes(geometry = geometry, fill = particulate_matter)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+ggplot(dmv, aes(geometry = geometry, fill = no_highschool)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "No High-School Diploma", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggplot(dmv, aes(geometry = geometry, fill = asthma_prev)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+poverty_plot = ggplot(dmv, aes(geometry = geometry, fill = poverty)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Poverty Rate", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-ggplot(dmv, aes(geometry = geometry, fill = pm2.5)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c()
+ggsave("poverty_plot.png", plot = poverty_plot)
+
+unemployment_plot = ggplot(dmv, aes(geometry = geometry, fill = unemployment)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Unemployment Rate", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("unemployment_plot.png", plot = unemployment_plot)
+
+nonwhite_plot = ggplot(dmv, aes(geometry = geometry, fill = non_white)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Non-White Percentage", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Percentage") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("nonwhite_plot.png", plot = nonwhite_plot)
+
+minority_plot = ggplot(dmv, aes(geometry = geometry, fill = minority)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Minority Prevalence", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("minority_plot.png", plot = minority_plot)
+
+income_plot = ggplot(dmv, aes(geometry = geometry, fill = med_income)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Median Household Income", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Income") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("income_plot.png", plot = income_plot)
+
+ggplot(dmv, aes(geometry = geometry, fill = est_population)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Estimated Population", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Population") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+## Environmental Variables
+
+flood_plot = ggplot(dmv, aes(geometry = geometry, fill = percent_in_flood_zone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Percent in Flood Zone", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Percent") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("flood_plot.png", plot = flood_plot)
+
+pm25_plot = ggplot(dmv, aes(geometry = geometry, fill = pm2.5)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "PM2.5 Burden", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Mean Days Above Standard") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("pm25_plot.png", plot = pm25_plot)
+
+ozone_plot = ggplot(dmv, aes(geometry = geometry, fill = ozone)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Ozone Burden", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Mean Days Above Standard") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggsave("ozone_plot.png", plot = ozone_plot)
+
+ggplot(dmv, aes(geometry = geometry, fill = particulate_matter)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Particulate Matter", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Concentration") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 ```
 
 ```{r}
-# Load FEMA flood hazard shapefiles (already filtered for SFHA_TF == "T")
-dc_flood = st_read("shapefiles/dc_nfhl.shp") %>% filter(SFHA_TF == "T")
-md_flood = st_read("shapefiles/md_nfhl.shp") %>% filter(SFHA_TF == "T")
-va_flood = st_read("shapefiles/va_nfhl.shp") %>% filter(SFHA_TF == "T")
+asthma_plot = ggplot(dmv, aes(geometry = geometry, fill = asthma_prev)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Prevalence", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
 
-# Merge all flood hazard areas
-all_flood = bind_rows(dc_flood, md_flood, va_flood)
-```
-
-```{r}
-ggplot(data = NULL) + 
-  geom_sf(data = dmv, aes(geometry = geometry)) + 
-  geom_sf(data = all_flood, aes(geometry = geometry, fill = as.factor(FLD_ZON))) + 
-  scale_color_viridis_d() + 
-  coord_sf()
+ggsave("asthma_plot.png", plot = asthma_plot)
 
 ```
-
-
-
-
-
