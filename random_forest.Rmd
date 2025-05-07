@@ -1,0 +1,92 @@
+---
+title: "Random Forest"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(readr)
+require(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+require(stringr)
+require(tigris)
+require(randomForest)
+```
+
+## Load data
+
+```{r}
+dmv_data = read_csv("./data/dmv_combined_data.csv")
+dmv_flood_risk = read_csv("./data/dmv_flood_risk_percent.csv")
+
+dmv_flood_risk = dmv_flood_risk %>% rename(fips = GEOID)
+dmv_data = dmv_data %>% select(!c("geometry"))
+dmv = full_join(dmv_data, dmv_flood_risk, by = "fips")
+
+dc_tracts <- tracts(state = "DC", cb = TRUE, year = 2022)
+md_tracts <- tracts(state = "MD", cb = TRUE, year = 2022)
+va_tracts <- tracts(state = "VA", cb = TRUE, year = 2022)
+tracts = rbind(dc_tracts, md_tracts, va_tracts) %>% rename(fips = GEOID) %>% mutate(fips = as.double(fips)) %>% select(!c("STATEFP", "COUNTYFP", "TRACTCE", "AFFGEOID", "NAME", "NAMELSAD", "STUSPS", "NAMELSADCO", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
+
+dmv = left_join(dmv, tracts, by = "fips")
+```
+
+## Random Forest
+
+```{r}
+## Split Data
+set.seed(6289)
+sample <- sample(c(TRUE, FALSE), nrow(dmv), replace=TRUE, prob=c(0.8,0.2))
+dmv_train  <- dmv[sample, ]
+dmv_test   <- dmv[!sample, ]
+```
+
+```{r}
+## Random Forest
+set.seed(6289)
+dmv_data = select(dmv, "area_sqmi":"flood_risk")
+dmv_rf = randomForest(asthma_prev ~ ., data = dmv_data, importance = T, na.action = na.exclude)
+dmv_rf
+```
+
+```{r}
+plot(dmv_rf)
+```
+
+## Variable Importance
+
+```{r}
+importance(dmv_rf, type = 1)
+varImpPlot(dmv_rf, type = 1)
+```
+
+## Residuals
+
+```{r}
+dmv_res = residuals(dmv_rf)
+```
+
+## Predictions
+
+```{r}
+dmv_pred = predict(dmv_rf, cpkgs = "randomForest")
+dmv$asthma_pred = dmv_pred
+```
+
+```{r}
+ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Predictions", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+```
+
+
+
+
