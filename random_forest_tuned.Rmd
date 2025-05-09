@@ -1,0 +1,319 @@
+---
+title: "Random Forest"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(readr)
+require(sf)
+require(ggplot2)
+require(tidyverse)
+require(broom)
+require(fields)
+require(geoR)
+require(tmap)
+require(spdep)
+require(sphet)
+require(sp)
+require(INLA)
+require(gstat)
+require(stringr)
+require(tigris)
+require(randomForest)
+```
+
+## Load data
+
+```{r}
+dmv_data = read_csv("./data/dmv_combined_data.csv")
+dmv_flood_risk = read_csv("./data/dmv_flood_risk_percent.csv")
+
+dmv_flood_risk = dmv_flood_risk %>% rename(fips = GEOID)
+dmv_data = dmv_data %>% select(!c("geometry"))
+dmv = full_join(dmv_data, dmv_flood_risk, by = "fips")
+
+dc_tracts <- tracts(state = "DC", cb = TRUE, year = 2022)
+md_tracts <- tracts(state = "MD", cb = TRUE, year = 2022)
+va_tracts <- tracts(state = "VA", cb = TRUE, year = 2022)
+tracts = rbind(dc_tracts, md_tracts, va_tracts) %>% rename(fips = GEOID) %>% mutate(fips = as.double(fips)) %>% select(!c("STATEFP", "COUNTYFP", "TRACTCE", "AFFGEOID", "NAME", "NAMELSAD", "STUSPS", "NAMELSADCO", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
+
+dmv = left_join(dmv, tracts, by = "fips")
+```
+
+## Random Forest
+
+```{r}
+## Split Data
+set.seed(6289)
+sample <- sample(c(TRUE, FALSE), nrow(dmv), replace=TRUE, prob=c(0.8,0.2))
+dmv_train  <- dmv[sample, ]
+dmv_test   <- dmv[!sample, ]
+
+```
+
+```{r}
+## Random Forest
+set.seed(6289)
+dmv_data = select(dmv_train, "area_sqmi":"flood_risk")
+### Added: Convert all character columns to factor (before modeling)
+# Step 1: Select numeric + factor modeling variables only
+dmv_data <- dmv_train %>%
+  dplyr::select(area_sqmi:flood_risk)
+
+# Step 2: Convert character columns to factor
+dmv_data <- dmv_data %>%
+  dplyr::mutate(across(where(is.character), as.factor))
+
+# Step 3: Drop high-cardinality factor variables (nlevels > 53)
+too_many_levels <- sapply(dmv_data, function(x) is.factor(x) && nlevels(x) > 53)
+dmv_data <- dmv_data[, !too_many_levels]
+
+# Step 4: (Optional) confirm no illegal variables remain
+str(dmv_data)  # or View(dmv_data)
+
+sapply(dmv_data, nlevels)
+sapply(dmv_data, function(x) if (is.factor(x)) nlevels(x) else NA)
+
+# ###
+dmv_rf = randomForest(asthma_prev ~ ., data = dmv_data, importance = T, na.action = na.roughfix)
+dmv_rf
+
+```
+
+```{r}
+### Tuning
+set.seed(6289)
+
+# Tune mtry (number of variables tried at each split)
+# Tune nodesize (minimum size of terminal nodes)
+# Tune maxnodes (maximum number of terminal nodes per tree)
+
+dmv_rf_tuned <- randomForest(
+  asthma_prev ~ .,
+  data = dmv_data,
+  ntree = 500,          # number of trees
+  mtry = 15,             # try mtry = 15, adjust depending on # of predictors
+  nodesize = 10,        # larger nodes = less overfitting
+  maxnodes = 50,        # limit tree depth
+  importance = TRUE,
+  na.action = na.roughfix
+)
+
+# Compare training performance
+print(dmv_rf)         # original model
+print(dmv_rf_tuned)   # tuned model
+
+# OOB Error vs Number of Trees
+plot(dmv_rf_tuned$mse, type = "l", col = "blue", lwd = 2,
+     ylab = "OOB MSE", xlab = "Number of Trees",
+     main = "OOB Error vs Number of Trees")
+
+```
+
+```{r}
+plot(dmv_rf)
+
+```
+
+### Added: The performance of the model on the test set
+```{r}
+# Match the same structure as the training data
+dmv_test_data <- dmv_test %>%
+  select(area_sqmi:flood_risk) %>% 
+  mutate(across(where(is.character), as.factor)) # Ensure factor types
+
+# Drop high-cardinality factors (same rule as training)
+too_many_levels <- sapply(dmv_test_data, function(x) is.factor(x) && nlevels(x) > 53)
+dmv_test_data <- dmv_test_data[, !too_many_levels]
+
+# Match column order to training data
+dmv_test_data <- dmv_test_data[, colnames(dmv_data)]
+
+# Fill missing values the same way as training (na.roughfix)
+dmv_test_data <- na.roughfix(dmv_test_data)
+
+# ### R_squared negative version ###
+# # Predict asthma prevalence on the test set
+# test_pred <- predict(dmv_rf, newdata = dmv_test)
+# 
+# # Extract actual values from the test set
+# test_actual <- dmv_test$asthma_prev
+# 
+# # Compute RMSE (Root Mean Squared Error)
+# rmse <- sqrt(mean((test_actual - test_pred)^2))
+# 
+# # Compute R-squared
+# r_squared <- 1 - sum((test_actual - test_pred)^2) / sum((test_actual - mean(test_actual))^2)
+# 
+# # Print results
+# cat("Test RMSE: ", round(rmse, 3), "\n")
+# cat("Test R-squared: ", round(r_squared, 3), "\n")
+# #######
+
+# Step 1: Predict both models
+test_pred <- predict(dmv_rf, newdata = dmv_test_data)
+test_pred_tuned <- predict(dmv_rf_tuned, newdata = dmv_test_data)
+
+# Step 2: Get actual values
+test_actual <- dmv_test$asthma_prev[as.numeric(rownames(dmv_test_data))]
+
+# Step 3: Identify complete cases across all three vectors
+non_missing <- complete.cases(test_actual, test_pred, test_pred_tuned)
+
+# Step 4: Subset all three
+test_actual <- test_actual[non_missing]
+test_pred <- test_pred[non_missing]
+test_pred_tuned <- test_pred_tuned[non_missing]
+
+# Step 5: Compute metrics for both models
+rmse <- sqrt(mean((test_actual - test_pred)^2))
+r_squared <- 1 - sum((test_actual - test_pred)^2) / sum((test_actual - mean(test_actual))^2)
+relative_rmse <- (rmse / mean(test_actual)) * 100
+
+rmse_tuned <- sqrt(mean((test_actual - test_pred_tuned)^2))
+r_squared_tuned <- 1 - sum((test_actual - test_pred_tuned)^2) / sum((test_actual - mean(test_actual))^2)
+relative_rmse_tuned <- (rmse_tuned / mean(test_actual)) * 100
+
+# Step 6: Print results
+cat("Original RF Test RMSE:", round(rmse, 3), "\n")
+cat("Original RF Test R-squared:", round(r_squared, 3), "\n")
+cat("Original RF Relative RMSE (%):", round(relative_rmse, 2), "%\n\n")
+
+cat("Tuned RF Test RMSE:", round(rmse_tuned, 3), "\n")
+cat("Tuned RF Test R-squared:", round(r_squared_tuned, 3), "\n")
+cat("Tuned RF Relative RMSE (%):", round(relative_rmse_tuned, 2), "%\n")
+
+# 
+# 
+# # Predict
+# test_pred <- predict(dmv_rf, newdata = dmv_test_data)
+# test_pred_tuned <- predict(dmv_rf_tuned, newdata = dmv_test_data)
+# 
+# non_missing <- !is.na(test_actual)
+# test_actual_tuned <- test_actual[non_missing]
+# test_pred_tuned <- test_pred_tuned[non_missing]
+# # Align actual values
+# test_actual <- dmv_test$asthma_prev[as.numeric(rownames(dmv_test_data))]
+# 
+# # Compute RMSE and R-squared
+# rmse <- sqrt(mean((test_actual - test_pred)^2))
+# r_squared <- 1 - sum((test_actual - test_pred)^2) / sum((test_actual - mean(test_actual))^2)
+# rmse_tuned <- sqrt(mean((test_actual - test_pred_tuned)^2))
+# r_squared_tuned <- 1 - sum((test_actual - test_pred_tuned)^2) / sum((test_actual - mean(test_actual))^2)
+# 
+# # Also show relative RMSE
+# relative_rmse <- (rmse / mean(test_actual)) * 100
+# relative_rmse_tuned <- (rmse_tuned / mean(test_actual)) * 100
+# 
+# # Print results
+# cat("Original RF Test RMSE:", round(rmse, 3), "\n")
+# cat("Original RF Test R-squared:", round(r_squared, 3), "\n")
+# cat("Original RF Relative RMSE (%):", round(relative_rmse, 2), "%\n")
+# 
+# cat("Tuned RF Test RMSE:", round(rmse_tuned, 3), "\n")
+# cat("Tuned RF Test R-squared:", round(r_squared_tuned, 3), "\n")
+# cat("Tuned RF Relative RMSE (%):", round(relative_rmse_tuned, 2), "%\n")
+# 
+# # Extract actual values for the same rows in test data
+# test_actual_full <- dmv_test$asthma_prev[as.numeric(rownames(dmv_test_data))]
+# 
+# # Filter out rows where asthma_prev is NA
+# non_missing <- !is.na(test_actual_full)
+# test_actual <- test_actual_full[non_missing]
+# test_pred <- test_pred[non_missing]
+# 
+# # Compute RMSE and R²
+# rmse <- sqrt(mean((test_actual - test_pred)^2))
+# r_squared <- 1 - sum((test_actual - test_pred)^2) / sum((test_actual - mean(test_actual))^2)
+# rmse_tuned <- sqrt(mean((test_actual - test_pred_tuned)^2))
+# r_squared_tuned <- 1 - sum((test_actual - test_pred_tuned)^2) / sum((test_actual - mean(test_actual))^2)
+# 
+# 
+# # Output results
+# cat("Original RF Test RMSE:", round(rmse, 3), "\n")
+# cat("Original RF Test R-squared:", round(r_squared, 3), "\n")
+# cat("Original RF Relative RMSE (%):", round(relative_rmse, 2), "%\n")
+# 
+# cat("Tuned RF Test RMSE:", round(rmse_tuned, 3), "\n")
+# cat("Tuned RF Test R-squared:", round(r_squared_tuned, 3), "\n")
+# cat("Tuned RF Relative RMSE (%):", round(relative_rmse_tuned, 2), "%\n")
+
+```
+
+## Variable Importance
+
+```{r}
+importance_values <- importance(dmv_rf, type = 1)
+print(importance_values)
+varImpPlot(dmv_rf, type = 1)
+top_10_vars <- names(sort(importance_values[, 1], decreasing = TRUE))[1:10]
+print(top_10_vars)
+dmv_top_10_vars_data <- dmv_data[, c("asthma_prev", top_10_vars)]
+write.csv(dmv_top_10_vars_data, "dmv_top_10_vars_data.csv", row.names = FALSE)
+# top_20_vars <- names(sort(importance_values[, 1], decreasing = TRUE))[1:20]
+# dmv_top_20_vars_data <- dmv_data[, c("asthma_prev", top_20_vars)]
+# write.csv(dmv_top_20_vars_data, "dmv_top_20_vars_data.csv", row.names = FALSE)
+```
+
+
+## Residuals
+
+```{r}
+dmv_res = residuals(dmv_rf)
+
+# Added: Residual Plot
+# Compute residuals manually
+fitted_vals <- predict(dmv_rf)  # This uses training data internally
+actual_vals <- dmv_data$asthma_prev  # Training set actual values
+residuals_rf <- actual_vals - fitted_vals
+
+# Now safe to combine into a dataframe
+resid_df <- data.frame(Fitted = fitted_vals, Residuals = residuals_rf)
+
+# Plot residuals
+ggplot(resid_df, aes(x = Fitted, y = Residuals)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Residuals vs Fitted Values",
+       x = "Fitted Values",
+       y = "Residuals") +
+  theme_minimal()
+
+```
+
+## Predictions
+
+```{r}
+dmv_pred = predict(dmv_rf, cpkgs = "randomForest")
+# dmv_data$asthma_pred = dmv_pred
+dmv$asthma_pred <- NA
+dmv$asthma_pred[as.numeric(rownames(dmv_train))] <- dmv_pred
+```
+
+```{r}
+# ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Predictions", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) +
+  geom_sf(color = NA) +
+  coord_sf() +
+  scale_fill_viridis_c() +
+  labs(
+    title = "Asthma Predictions",
+    subtitle = "DMV Area",
+    xlab = "Longitude",
+    ylab = "Latitude",
+    fill = "Predicted Prevalence"
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title.position = "top",
+    plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm")
+  )
+```
+
+
+
+
