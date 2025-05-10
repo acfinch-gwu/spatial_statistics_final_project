@@ -1,6 +1,8 @@
 ---
-title: "Random Forest"
-output: html_document
+title: "Random Forest Model 1"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -49,18 +51,45 @@ set.seed(6289)
 sample <- sample(c(TRUE, FALSE), nrow(dmv), replace=TRUE, prob=c(0.8,0.2))
 dmv_train  <- dmv[sample, ]
 dmv_test   <- dmv[!sample, ]
+
 ```
 
 ```{r}
 ## Random Forest
 set.seed(6289)
-dmv_data = select(dmv, "area_sqmi":"flood_risk")
+dmv_data = select(dmv_train, "area_sqmi":"flood_risk")
 dmv_rf = randomForest(asthma_prev ~ ., data = dmv_data, importance = T, na.action = na.exclude)
 dmv_rf
 ```
 
 ```{r}
 plot(dmv_rf)
+```
+
+## Added: The performance of the model on the test set
+```{r}
+# Use the same variables for test set as in training
+dmv_test_data <- dmv_test %>% select(area_sqmi:flood_risk)
+
+# Drop rows with missing values (if any)
+dmv_test_data <- na.omit(dmv_test_data)
+
+# Predict using cleaned test data
+test_pred <- predict(dmv_rf, newdata = dmv_test_data)
+
+# Align actual values (only for non-NA rows)
+test_actual <- dmv_test$asthma_prev[as.numeric(rownames(dmv_test_data))]
+
+# Compute RMSE (Root Mean Squared Error)
+rmse <- sqrt(mean((test_actual - test_pred)^2))
+
+# Compute R-squared (proportion of variance explained)
+r_squared <- 1 - sum((test_actual - test_pred)^2) / sum((test_actual - mean(test_actual))^2)
+
+# Print results
+cat("Test RMSE: ", round(rmse, 3), "\n")
+cat("Test R-squared: ", round(r_squared, 3), "\n")
+
 ```
 
 ## Variable Importance
@@ -74,17 +103,58 @@ varImpPlot(dmv_rf, type = 1)
 
 ```{r}
 dmv_res = residuals(dmv_rf)
+
+# Added: Residual Plot
+# Compute residuals manually
+
+fitted_vals <- predict(dmv_rf)  # This uses training data internally
+actual_vals <- dmv_data$asthma_prev  # Training set actual values
+residuals_rf <- actual_vals - fitted_vals
+
+# Now safe to combine into a dataframe
+resid_df <- data.frame(Fitted = fitted_vals, Residuals = residuals_rf)
+
+# Plot residuals
+ggplot(resid_df, aes(x = Fitted, y = Residuals)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Residuals vs Fitted Values",
+       x = "Fitted Values",
+       y = "Residuals") +
+  theme_minimal()
+
+
 ```
 
 ## Predictions
 
 ```{r}
 dmv_pred = predict(dmv_rf, cpkgs = "randomForest")
-dmv$asthma_pred = dmv_pred
+# dmv$asthma_pred = dmv_pred
+dmv$asthma_pred <- NA
+dmv$asthma_pred[as.numeric(rownames(dmv_train))] <- dmv_pred
 ```
 
 ```{r}
-ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Predictions", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+# ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) + geom_sf(col = NA) + coord_sf() + scale_fill_viridis_c() + labs(title = "Asthma Predictions", subtitle = "DMV Area", xlab = "Longitude", ylab = "Latitude", fill = "Prevalence") + theme(legend.position = "top", legend.title.position = "top", plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm"))
+
+ggplot(dmv, aes(geometry = geometry, fill = asthma_pred)) +
+  geom_sf(color = NA) +
+  coord_sf() +
+  scale_fill_viridis_c() +
+  labs(
+    title = "Asthma Predictions for Version 1",
+    subtitle = "DMV Area",
+    xlab = "Longitude",
+    ylab = "Latitude",
+    fill = "Predicted Prevalence"
+  ) +
+  theme(
+    legend.position = "top",
+    legend.title.position = "top",
+    plot.margin = unit(c(0.05, 0.05, 0.05, 0.05), "cm")
+  )
+
 ```
 
 

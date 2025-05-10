@@ -26,10 +26,10 @@ options(tigris_use_cache = TRUE)
 
 ```{r}
 # ───────────────────────────────────────────────────────────────────────────────
-# 1. Read your DMV attribute table & standardize FIPS
+# 1. Read DMV attribute table & standardize FIPS
 # ───────────────────────────────────────────────────────────────────────────────
 dmv_data <- read_csv(
-  "/Users/g35441498/Desktop/spatial_statistics_final_project-main/dmv_data.csv",
+  "./final_model_data.csv",
   show_col_types = FALSE
 ) %>%
   mutate(fips = str_pad(as.character(fips), width = 11, pad = "0"))
@@ -119,103 +119,104 @@ spdep::moran.plot(
 
 ```
 
-#Step 3: variables choosing
-```{r}
-# ---- 0.  Packages ------------------------------------------------------------
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(broom)          # tidy() for model output
-library(psych)          # describe(), corr.test()
-library(ggcorrplot)     # prettier correlation heat-map
+## Step 3 Variable selection seeing vars_final_selection.Rmd
+Data of selected variables already loaded in Step 1.
+<!-- #Step 3: variables choosing -->
+<!-- ```{r} -->
+<!-- # ---- 0.  Packages ------------------------------------------------------------ -->
+<!-- library(dplyr) -->
+<!-- library(tidyr) -->
+<!-- library(ggplot2) -->
+<!-- library(broom)          # tidy() for model output -->
+<!-- library(psych)          # describe(), corr.test() -->
+<!-- library(ggcorrplot)     # prettier correlation heat-map -->
 
-# -----------------------------------------------------------------
-# 0) Define variable groups for clarity & easy sub-setting
-# -----------------------------------------------------------------
+<!-- # ----------------------------------------------------------------- -->
+<!-- # 0) Define variable groups for clarity & easy sub-setting -->
+<!-- # ----------------------------------------------------------------- -->
 
-## 0a. Pollution & physical environment
-vars_pollute <- c("pm2.5", "ozone", "diesel", "road_proximity",
-                  "percent_in_flood_zone")      # flood exposure
+<!-- ## 0a. Pollution & physical environment -->
+<!-- vars_pollute <- c("pm2.5", "ozone", "diesel", "road_proximity", -->
+<!--                   "percent_in_flood_zone")      # flood exposure -->
 
-## 0b. Socio-economic status (SES & financial stress)
-vars_ses <- c("housing_cost_burden", "poverty", "unemployment")
+<!-- ## 0b. Socio-economic status (SES & financial stress) -->
+<!-- vars_ses <- c("housing_cost_burden", "poverty", "unemployment") -->
 
-## 0c. Education & language barriers
-vars_edu_lang <- c("no_highschool", "limited_english")
+<!-- ## 0c. Education & language barriers -->
+<!-- vars_edu_lang <- c("no_highschool", "limited_english") -->
 
-## 0d. Household crowding & caregiving
-vars_household <- c("crowded_housing", "single_parent")
+<!-- ## 0d. Household crowding & caregiving -->
+<!-- vars_household <- c("crowded_housing", "single_parent") -->
 
-## 0e. Age structure
-vars_age <- c("age_under_17", "age_over_65")
+<!-- ## 0e. Age structure -->
+<!-- vars_age <- c("age_under_17", "age_over_65") -->
 
-## 0f. Racial/ethnic composition
-vars_race <- c("minority")   # can add more like 'black', 'hispanic' if needed later
+<!-- ## 0f. Racial/ethnic composition -->
+<!-- vars_race <- c("minority")   # can add more like 'black', 'hispanic' if needed later -->
 
-## 0g. Outcome
-var_outcome <- "asthma_prev"
-
-
-# ---------------------------------------------------------------
-# Combine everything into ONE master vector for the model step
-# ---------------------------------------------------------------
-vars_all <- c(var_outcome,
-              vars_pollute,
-              vars_ses,
-              vars_edu_lang,
-              vars_household,
-              vars_age,
-              vars_race)
-# ---------------------------------------------------------------
-# 1) Subset and drop rows with any missing values in vars_all
-# ---------------------------------------------------------------
-model_df <- dmv_data %>%
-  dplyr::select(all_of(vars_all)) %>%
-  tidyr::drop_na()          # geometry stays intact if dmv_data is an sf object
-
-```
+<!-- ## 0g. Outcome -->
+<!-- var_outcome <- "asthma_prev" -->
 
 
-```{r}
-## 2a. Spearman correlations with asthma_prev -------------------------------
-cont_vars  <- setdiff(names(model_df), "asthma_prev")
+<!-- # --------------------------------------------------------------- -->
+<!-- # Combine everything into ONE master vector for the model step -->
+<!-- # --------------------------------------------------------------- -->
+<!-- vars_all <- c(var_outcome, -->
+<!--               vars_pollute, -->
+<!--               vars_ses, -->
+<!--               vars_edu_lang, -->
+<!--               vars_household, -->
+<!--               vars_age, -->
+<!--               vars_race) -->
+<!-- # --------------------------------------------------------------- -->
+<!-- # 1) Subset and drop rows with any missing values in vars_all -->
+<!-- # --------------------------------------------------------------- -->
+<!-- model_df <- dmv_data %>% -->
+<!--   dplyr::select(all_of(vars_all)) %>% -->
+<!--   tidyr::drop_na()          # geometry stays intact if dmv_data is an sf object -->
 
-cor_out <- psych::corr.test(model_df[, c("asthma_prev", cont_vars)],
-                             method = "spearman", adjust = "BH")
-
-# neat heat-map (upper triangle) -------------------------------------------
-ggcorrplot(cor_out$r,
-           hc.order = TRUE,            # cluster similar variables
-           type      = "upper",
-           lab       = TRUE,
-           title     = "Spearman correlations with asthma prevalence")
-
-
-# ---- Packages ---------------------------------------------------------------
-if (!require(car)) install.packages("car")
-library(car)          # for vif()
-
-# ---- Trimmed-variable linear model -----------------------------------------
-lm_trim <- lm(
-  asthma_prev ~ pm2.5 + ozone + diesel + road_proximity + 
-                percent_in_flood_zone +
-                housing_cost_burden + poverty + unemployment +
-                no_highschool + limited_english +
-                crowded_housing + single_parent +
-                age_under_17 + age_over_65,
-  data = dmv_data
-)
-
-# ---- Re-estimate VIFs -------------------------------------------------------
-vif_vals <- vif(lm_trim)
-print(vif_vals)
-
-# optional: flag any values > 4
-vif_vals[vif_vals > 4]
+<!-- ``` -->
 
 
-```
+<!-- ```{r} -->
+<!-- ## 2a. Spearman correlations with asthma_prev ------------------------------- -->
+<!-- cont_vars  <- setdiff(names(model_df), "asthma_prev") -->
 
+<!-- cor_out <- psych::corr.test(model_df[, c("asthma_prev", cont_vars)], -->
+<!--                              method = "spearman", adjust = "BH") -->
+
+<!-- # neat heat-map (upper triangle) ------------------------------------------- -->
+<!-- ggcorrplot(cor_out$r, -->
+<!--            hc.order = TRUE,            # cluster similar variables -->
+<!--            type      = "upper", -->
+<!--            lab       = TRUE, -->
+<!--            title     = "Spearman correlations with asthma prevalence") -->
+
+
+<!-- # ---- Packages --------------------------------------------------------------- -->
+<!-- if (!require(car)) install.packages("car") -->
+<!-- library(car)          # for vif() -->
+
+<!-- # ---- Trimmed-variable linear model ----------------------------------------- -->
+<!-- lm_trim <- lm( -->
+<!--   asthma_prev ~ pm2.5 + ozone + diesel + road_proximity +  -->
+<!--                 percent_in_flood_zone + -->
+<!--                 housing_cost_burden + poverty + unemployment + -->
+<!--                 no_highschool + limited_english + -->
+<!--                 crowded_housing + single_parent + -->
+<!--                 age_under_17 + age_over_65, -->
+<!--   data = dmv_data -->
+<!-- ) -->
+
+<!-- # ---- Re-estimate VIFs ------------------------------------------------------- -->
+<!-- vif_vals <- vif(lm_trim) -->
+<!-- print(vif_vals) -->
+
+<!-- # optional: flag any values > 4 -->
+<!-- vif_vals[vif_vals > 4] -->
+
+
+<!-- ``` -->
 
 
 
@@ -231,19 +232,19 @@ library(tidyr)
 # -------------------------------------------------------------------
 # 1) Define variables for the final OLS / spatial-diagnostic workflow
 # -------------------------------------------------------------------
-vars_selected <- c(
-  "asthma_prev",
-  "pm2.5", "ozone", "road_proximity", "percent_in_flood_zone",
-  "poverty", "crowded_housing", "limited_english",
-  "age_under_17", "minority"
-)
+
+vars_selected <- c("ozone", "cancer_prob", "watershed_proximity", "area_sqmi", "house_age", "walkability",
+                "percent_in_flood_zone", "asian", "hispanic", "two_or_more", "limited_english",
+                "uninsured", "unemployment", "labor_participation", "single_parent", "mobile_homes", "housing_stress")
+
 
 # -------------------------------------------------------------------
 # 2) Keep only tracts with complete data on vars
 # -------------------------------------------------------------------
 model_data <- dmv_sf_clean %>%
-  dplyr::select(all_of(vars_selected)) %>%   # keep geometry
+  dplyr::select(asthma_prev, all_of(vars_selected)) %>%
   tidyr::drop_na()
+
 
 # -------------------------------------------------------------------
 # 3) Build neighbors & spatial weights on the SAME subset
@@ -251,17 +252,14 @@ model_data <- dmv_sf_clean %>%
 nb_mod <- spdep::poly2nb(model_data, queen = TRUE)
 lw_mod <- spdep::nb2listw(nb_mod, style = "W", zero.policy = TRUE)
 
-# -------------------------------------------------------------------
-# 4) Fit ordinary least-squares (OLS) model
-# -------------------------------------------------------------------
-ols_model <- lm(
-  asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data = model_data
-)
-summary(ols_model)    # inspect coefficients
+library(sf)
 
+# 4) Fit OLS without geometry
+ols_model <- lm(
+  asthma_prev ~ .,
+  data = model_data |> st_drop_geometry()   # <- remove spatial column
+)
+summary(ols_model)
 # -------------------------------------------------------------------
 # 5) Attach residuals to the sf data frame
 # -------------------------------------------------------------------
@@ -291,330 +289,269 @@ spdep::moran.plot(
 
 ```
 
-# Step 5: SLM SEM Regression 
+#step 5 compare sdem sem car 
 
 ```{r}
-library(spatialreg)   # for lagsarlm() and errorsarlm()
-library(spdep)        # for moran.test()
+library(sf)
+library(dplyr)
+library(tidyr)
+library(spdep)       # neighbours + weights
+library(spatialreg)  # spautolm(), errorsarlm(), lagsarlm()
 
-# ───────────────────────────────────────────────────────────────────────────────
-# 4.1 Spatial Lag Model (SLM)
-# ───────────────────────────────────────────────────────────────────────────────
-slm_model <- lagsarlm(
-  asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data = model_data,
-  listw = lw_mod,
-  zero.policy = TRUE
+## ───────────────────────────────────────────────────────────────
+## 0.  Variable list stays in ONE place
+## ───────────────────────────────────────────────────────────────
+vars_selected <- c(
+  "ozone", "cancer_prob", "watershed_proximity", "area_sqmi",
+  "house_age", "walkability", "percent_in_flood_zone",
+  "asian", "hispanic", "two_or_more", "limited_english",
+  "uninsured", "unemployment", "labor_participation",
+  "single_parent", "mobile_homes", "housing_stress"
 )
-summary(slm_model)
 
-# ───────────────────────────────────────────────────────────────────────────────
-# 4.2 Spatial Error Model (SEM)
-# ───────────────────────────────────────────────────────────────────────────────
-sem_modelel <- errorsarlm(
-  asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data = model_data,
-  listw = lw_mod,
-  zero.policy = TRUE
+## ───────────────────────────────────────────────────────────────
+## 1.  Build analysis set once
+## ───────────────────────────────────────────────────────────────
+sf_model <- dmv_sf_clean |>
+  select(asthma_prev, all_of(vars_selected)) |>
+  drop_na()                       # still an sf object
+
+model_data <- st_drop_geometry(sf_model)     # plain data.frame
+
+nb_mod  <- poly2nb(sf_model, queen = TRUE)   # contiguity neighbours
+lw_mod  <- nb2listw(nb_mod, style = "W", zero.policy = TRUE)
+
+## common formula
+form <- as.formula(
+  paste("asthma_prev ~", paste(vars_selected, collapse = " + "))
 )
-summary(sem_modelel)
 
-# ───────────────────────────────────────────────────────────────────────────────
-# 4.3 Compare AIC across models
-# ───────────────────────────────────────────────────────────────────────────────
-aic_ols <- AIC(ols_model)
-aic_slm <- AIC(slm_model)
-aic_sem <- AIC(sem_modelel)
+## ───────────────────────────────────────────────────────────────
+## 2.  OLS (already fitted earlier, re-fit here for completeness)
+## ───────────────────────────────────────────────────────────────
+ols_model <- lm(form, data = model_data)
 
-cat("AIC - OLS:", aic_ols, "\n",
-    "AIC - Spatial Lag:", aic_slm, "\n",
-    "AIC - Spatial Error:", aic_sem, "\n")
-
-# ───────────────────────────────────────────────────────────────────────────────
-# 4.4 Compute Pseudo-R² for each model
-# ───────────────────────────────────────────────────────────────────────────────
-pseudoR2 <- function(resid, y) {
-  sse <- sum(resid^2)
-  sst <- sum((y - mean(y))^2)
-  1 - (sse / sst)
-}
-
-r2_ols <- pseudoR2(residuals(ols_model), model_data$asthma_prev)
-r2_slm <- pseudoR2(residuals(slm_model), model_data$asthma_prev)
-r2_sem <- pseudoR2(residuals(sem_modelel), model_data$asthma_prev)
-
-cat("Pseudo-R² - OLS:", r2_ols, "\n",
-    "Pseudo-R² - Spatial Lag:", r2_slm, "\n",
-    "Pseudo-R² - Spatial Error:", r2_sem, "\n")
-
-# ───────────────────────────────────────────────────────────────────────────────
-# 4.5 Moran’s I on residuals for each model
-# ───────────────────────────────────────────────────────────────────────────────
-moran_ols <- moran.test(residuals(ols_model), lw_mod, zero.policy = TRUE)
-moran_slm <- moran.test(residuals(slm_model), lw_mod, zero.policy = TRUE)
-moran_sem <- moran.test(residuals(sem_modelel), lw_mod, zero.policy = TRUE)
-
-cat("Moran's I p-value - OLS Residuals:", moran_ols$p.value, "\n",
-    "Moran's I p-value - Lag Residuals:", moran_slm$p.value, "\n",
-    "Moran's I p-value - Error Residuals:", moran_sem$p.value, "\n")
-
-
-```
-
-#Step 6 Car model
-
-```{r}
-library(spdep)        # spautolm() for CAR
-library(spatialreg)   # moran.test()
-
-# ── 1·1  Fit the CAR model (Gaussian response) ────────────────────────────────
+## ───────────────────────────────────────────────────────────────
+## 3.  CAR model (Gaussian)
+## ───────────────────────────────────────────────────────────────
 car_model <- spautolm(
- asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data   = model_data,
-  listw  = lw_mod,
-  family = "CAR",          # <-- conditional autoregressive
+  form, data = model_data,
+  listw = lw_mod,
+  family = "CAR",
   zero.policy = TRUE
 )
 summary(car_model)
 
-# ── 1·2  Compare information criteria (lower = better) ────────────────────────
-AICvals <- c(
-  OLS   = AIC(ols_model),
-  SLM   = AIC(slm_model),
-  SEM   = AIC(sem_modelel),
-  CAR   = AIC(car_model)
-)
-print(round(AICvals, 1))
-
-# ── 1·3  Pseudo-R² for CAR (same formula as before) ───────────────────────────
-pseudoR2 <- function(resid, y) 1 - sum(resid^2)/sum((y - mean(y))^2)
-r2_car <- pseudoR2(residuals(car_model), model_data$asthma_prev)
-print(r2_car)
-
-# ── 1·4  Residual Moran’s I to check remaining autocorrelation ────────────────
-moran_car <- moran.test(residuals(car_model), lw_mod, zero.policy = TRUE)
-cat("CAR residual Moran p-value:", moran_car$p.value, "\n")
-
-```
-
-
-#Step7: SDEM model
-
-```{r}
-library(spatialreg)
-library(Matrix)
-
-# ───────────────────────────────────────────────────────────────────────────────
-# 1. Fit SEM & SDEM 
-# ───────────────────────────────────────────────────────────────────────────────
+## ───────────────────────────────────────────────────────────────
+## 4.  SEM  vs  SDEM
+## ───────────────────────────────────────────────────────────────
 sem_model <- errorsarlm(
- asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data        = model_data,
-  listw       = lw_mod,
-  Durbin      = FALSE,
+  form, data = model_data,
+  listw = lw_mod,
+  Durbin = FALSE,
   zero.policy = TRUE
 )
 
 sdem_model <- errorsarlm(
- asthma_prev ~ pm2.5 + ozone + road_proximity + percent_in_flood_zone +
-                poverty + crowded_housing + limited_english +
-                age_under_17 + minority,
-  data        = model_data,
-  listw       = lw_mod,
-  Durbin      = TRUE,
+  form, data = model_data,
+  listw = lw_mod,
+  Durbin = TRUE,        # adds spatially-lagged X’s
   zero.policy = TRUE
 )
 
-# ───────────────────────────────────────────────────────────────────────────────
-# 2. Likelihood-ratio test (SDEM vs SEM)
-# ───────────────────────────────────────────────────────────────────────────────
-# Perform likelihood-ratio test
-lr_res <- anova(sdem_model, sem_model)
-print(lr_res)
-# ───────────────────────────────────────────────────────────────────────────────
-# 3. Hausman test (with fallback to pseudo-inverse)
-# ───────────────────────────────────────────────────────────────────────────────
-haus_fun <- function(big, small, tol = 1e-10) {
-  out <- tryCatch(
-    spatialreg::Hausman.test(big, small, tol = tol),
-    error = function(e) {
-      # Manual computation if Hausman.test fails
-      β_big   <- coef(big)
-      β_small <- coef(small)[names(β_big)]  # Align coefficients
-      V_big   <- vcov(big)
-      V_small <- vcov(small)[names(β_big), names(β_big)]
-      
-      V_diff  <- V_small - V_big  # Note: Order matters (V_small - V_big)
-      
-      # Use pseudo-inverse if matrix is near-singular
-      V_diff_inv <- try(solve(V_diff), silent = TRUE)
-      if (inherits(V_diff_inv, "try-error")) {
-        V_diff_inv <- Matrix::ginv(V_diff)
-      }
-      
-      q_diff <- β_big - β_small
-      chi    <- t(q_diff) %*% V_diff_inv %*% q_diff
-      p_val  <- pchisq(chi, df = length(β_big), lower.tail = FALSE)
-      
-      list(statistic = chi, parameter = length(β_big), p.value = p_val)
-    }
-  )
-  return(out)
-}
-
-haus_res <- haus_fun(sdem_model, sem_model)
-
-
-
-# Get log-likelihoods
-ll_sdem <- as.numeric(logLik(sdem_model))
-ll_sem <- as.numeric(logLik(sem_model))
-
-# Calculate test statistic
-LR_stat <- 2 * (ll_sdem - ll_sem)
-df_diff <- length(coef(sdem_model)) - length(coef(sem_model))
-
-# Get p-value
-p_value <- 1 - pchisq(LR_stat, df_diff)
-
-# Create results
-lr_res <- list(
-  statistic = LR_stat,
-  parameter = df_diff,
-  p.value = p_value,
-  method = "Likelihood ratio test for nested spatial models"
+## ───────────────────────────────────────────────────────────────
+## 5.  Information‐criteria comparison
+## ───────────────────────────────────────────────────────────────
+AICvals <- c(
+  OLS = AIC(ols_model),
+  SEM = AIC(sem_model),
+  SDEM = AIC(sdem_model),
+  CAR = AIC(car_model)
 )
-class(lr_res) <- "htest"
+print(round(AICvals, 2))
+
+## ───────────────────────────────────────────────────────────────
+## 6.  Pseudo-R² & Moran’s I
+## ───────────────────────────────────────────────────────────────
+pseudoR2 <- function(model, y)
+  1 - sum(residuals(model)^2) / sum((y - mean(y))^2)
+
+cat("Pseudo-R²\n",
+    "  OLS :", pseudoR2(ols_model,  model_data$asthma_prev), "\n",
+    "  SEM :", pseudoR2(sem_model,  model_data$asthma_prev), "\n",
+    "  SDEM:", pseudoR2(sdem_model, model_data$asthma_prev), "\n",
+    "  CAR :", pseudoR2(car_model,  model_data$asthma_prev), "\n")
+
+moran_car <- moran.test(residuals(car_model), lw_mod, zero.policy = TRUE)
+cat("Moran p-value (CAR residuals):", moran_car$p.value, "\n")
+
+## ───────────────────────────────────────────────────────────────
+## 7.  LR‐test  and  Hausman test (SDEM vs SEM)
+## ───────────────────────────────────────────────────────────────
+lr_res <- anova(sdem_model, sem_model)       # LR test
 print(lr_res)
-# ───────────────────────────────────────────────────────────────────────────────
-# 4. Model comparison table
-# ───────────────────────────────────────────────────────────────────────────────
-haus_p <- as.numeric(haus_res$p.value)     # force numeric
-lr_p   <- as.numeric(lr_res$p.value)       # you did this already
+
+haus_res <- spatialreg::Hausman.test(sdem_model, sem_model)
+print(haus_res)
+
+## safer extraction
+lr_p <- as.numeric(as.character(lr_res[2, "Pr(>Chi)"]))  # second row = full SDEM vs SEM
+haus_p <- as.numeric(haus_res$p.value)
 
 comp <- data.frame(
   Model     = c("SEM", "SDEM"),
   AIC       = c(AIC(sem_model),  AIC(sdem_model)),
-  LogLik    = c(logLik(sem_model), logLik(sdem_model)),
   LR_p      = c(NA, round(lr_p,   4)),
   Hausman_p = c(NA, round(haus_p, 4))
 )
 print(comp, row.names = FALSE)
-
-
-cat("\nDecision rules:\n",
-    "• LR_p < 0.05 ⇒ SDEM fits significantly better → prefer SDEM.\n",
-    "• Hausman_p < 0.05 ⇒ SEM is inconsistent → prefer SDEM.\n",
-    "• If both p > 0.05 and SEM has lower AIC, prefer SEM.\n")
-
 ```
 
-
-
+#step6 visualization
 ```{r}
-# ───────────────────────────────────────────────────────────────────────────────
-# STEP 4 :  Compare all candidate models and pick the “winner”
-# ───────────────────────────────────────────────────────────────────────────────
-# Assumes you already have these fitted objects in memory:
-#   lm_mod     – ordinary least-squares
-#   slm_model  – spatial lag model
-#   sem_model    – spatial error model   (or sem_modelel2 in earlier code)
-#   sdem_model   – spatial Durbin-error model
-#   car_model  – conditional autoregressive model   (optional; omit if not fitted)
+# ───────────────────────────────────────────────────────────
+#  Libraries
+# ───────────────────────────────────────────────────────────
+library(sf)
+library(dplyr)
+library(tidyr)
+library(spdep)        # neighbours, weights
+library(spatialreg)   # spatial models
+library(Matrix)       # pseudo-inverse (Hausman fallback)
+library(tmap)         # mapping
+library(broom)        # tidy coefficients
+library(ggplot2)
 
-# 4·1  Gather and rank by AIC
-models <- list(
-  OLS  = ols_model,
-  SLM  = slm_model,
-  SEM  = sem_model,
-  SDEM = sdem_model,
-  CAR  = car_model   # remove this line if you did not fit CAR
+#  0.  Master predictor list
+# ───────────────────────────────────────────────────────────
+vars_selected <- c(
+  "ozone", "cancer_prob", "watershed_proximity", "area_sqmi",
+  "house_age", "walkability", "percent_in_flood_zone",
+  "asian", "hispanic", "two_or_more", "limited_english",
+  "uninsured", "unemployment", "labor_participation",
+  "single_parent", "mobile_homes", "housing_stress"
 )
 
+# ───────────────────────────────────────────────────────────
+#  1.  Build modelling data
+# ───────────────────────────────────────────────────────────
+sf_model <- dmv_sf_clean |>
+  select(asthma_prev, all_of(vars_selected)) |>
+  drop_na()
+
+# 1.1  Drop pure islands (no neighbours) so all rows have at least 1 nb
+nb_all  <- poly2nb(sf_model, queen = TRUE)
+is_isle <- lengths(nb_all) == 0
+if (any(is_isle)) {
+  message("Dropping ", sum(is_isle), " island tracts with no neighbours.")
+  sf_model <- sf_model[!is_isle, ]
+}
+
+model_df <- st_drop_geometry(sf_model)
+
+# 1.2  Rebuild neighbour list & weights
+nb_mod <- poly2nb(sf_model, queen = TRUE, snap = 1e-7)   # small snap for tiny gaps
+lw_mod <- nb2listw(nb_mod, style = "W", zero.policy = TRUE)
+
+# 1.3  Symmetric weights for CAR
+lw_sym <- listw2U(lw_mod)   # binary, symmetric
+
+# ───────────────────────────────────────────────────────────
+#  2.  Unified formula
+# ───────────────────────────────────────────────────────────
+form <- reformulate(vars_selected, response = "asthma_prev")
+
+# ───────────────────────────────────────────────────────────
+#  3.  Fit models
+# ───────────────────────────────────────────────────────────
+ols_model  <- lm(form, data = model_df)
+
+sem_model  <- errorsarlm(form, data = model_df,
+                         listw = lw_mod, Durbin = FALSE,
+                         zero.policy = TRUE)
+
+sdem_model <- errorsarlm(form, data = model_df,
+                         listw = lw_mod, Durbin = TRUE,
+                         zero.policy = TRUE)
+
+car_model  <- spautolm(form, data = model_df,
+                       listw = lw_sym, family = "CAR",
+                       zero.policy = TRUE)
+
+# ───────────────────────────────────────────────────────────
+#  4.  LR + Hausman tests  (SDEM vs SEM)
+# ───────────────────────────────────────────────────────────
+lr_res   <- anova(sdem_model, sem_model)
+lr_p     <- as.numeric(as.character(lr_res[2, "Pr(>Chi)"]))  # coerce factor→numeric
+
+haus_res <- spatialreg::Hausman.test(sdem_model, sem_model)
+haus_p   <- haus_res$p.value
+
+# ───────────────────────────────────────────────────────────
+#  5.  Model-comparison table
+# ───────────────────────────────────────────────────────────
 aic_tbl <- data.frame(
-  Model = names(models),
-  AIC   = sapply(models, AIC, USE.NAMES = FALSE),
-  LogLik= sapply(models, logLik, USE.NAMES = FALSE)
+  Model  = c("OLS", "SEM", "SDEM", "CAR"),
+  AIC    = c(AIC(ols_model),  AIC(sem_model),
+             AIC(sdem_model), AIC(car_model)),
+  LogLik = c(logLik(ols_model),  logLik(sem_model),
+             logLik(sdem_model), logLik(car_model))
 ) |>
-  dplyr::arrange(AIC)
+  arrange(AIC)
 
 print(aic_tbl, row.names = FALSE)
+cat("\nLR test (SDEM vs SEM):   p =", round(lr_p,   4),
+    "\nHausman p-value:          ", round(haus_p, 4), "\n")
 
-```
-#Step 8: visualization
+# ───────────────────────────────────────────────────────────
+#  6.  Append SEM predictions & residuals for mapping
+# ───────────────────────────────────────────────────────────
+sf_model <- sf_model |>
+  mutate(pred_sem  = predict(sem_model),
+         resid_sem = residuals(sem_model))
 
-##residual
-```{r}
-# Attach predicted values and residuals from SEM model
-model_data$pred_sem  <- predict(sem_model)
-model_data$resid_sem <- residuals(sem_model)
-
-
-
-
-
-```
-```{r}
-library(tmap)
-tmap_mode("plot")
-
-# ---------------------------------------------------------------
-# 1 & 2. Observed and Predicted maps side-by-side
-# ---------------------------------------------------------------
+# ───────────────────────────────────────────────────────────
+#  7.  Quick maps (tmap, legacy syntax)
+# ───────────────────────────────────────────────────────────
 tmap_arrange(
-  tm_shape(model_data) +
-    tm_polygons("asthma_prev", palette = "Reds", title = "Observed Asthma") +
+  tm_shape(sf_model) +
+    tm_polygons("asthma_prev", palette = "Reds",
+                title = "Observed Asthma") +
     tm_layout(title = "Observed Asthma"),
-  
-  tm_shape(model_data) +
-    tm_polygons("pred_sem", palette = "Blues", title = "Predicted (SEM)") +
+
+  tm_shape(sf_model) +
+    tm_polygons("pred_sem", palette = "Blues",
+                title = "Predicted (SEM)") +
     tm_layout(title = "Predicted (SEM)"),
-  
   ncol = 2
 )
 
-# ---------------------------------------------------------------
-# 3. Residuals map
-# ---------------------------------------------------------------
-tm_shape(model_data) +
-  tm_polygons("resid_sem", palette = "-RdBu", style = "quantile",
-              title = "Residuals (SEM)") +
+tm_shape(sf_model) +
+  tm_polygons("resid_sem",
+              palette = "brewer.rd_bu",    # explicit palette
+              style   = "quantile",
+              title   = "SEM Residuals") +
   tm_layout(title = "Residuals (SEM)")
 
-```
-
-
-
-
-##model comparison
-
-```{r}
-# 6 Coefficient dot plot (direct effects only)
-library(broom)
+# ───────────────────────────────────────────────────────────
+#  8.  ggplot summaries
+# ───────────────────────────────────────────────────────────
 coef_df <- tidy(sdem_model, conf.int = TRUE)
+
 ggplot(coef_df, aes(estimate, term)) +
-  geom_pointrange(aes(xmin=conf.low, xmax=conf.high)) +
-  geom_vline(xintercept = 0, linetype="dotted") +
-  labs(x="Estimate (95% CI)", y=NULL, title="SDEM Coefficients") +
+  geom_pointrange(aes(xmin = conf.low, xmax = conf.high)) +
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  labs(x = "Estimate (95 % CI)", y = NULL,
+       title = "SDEM Coefficients") +
   theme_bw()
 
-# 7 AIC bar plot
 ggplot(aic_tbl, aes(reorder(Model, AIC), AIC)) +
   geom_col(fill = "steelblue") +
-  geom_text(aes(label = round(AIC,1)), vjust = -0.3) +
-  labs(y="AIC", x=NULL, title="Model Fit Comparison (lower is better)") +
+  geom_text(aes(label = round(AIC, 1)), vjust = -0.3) +
+  labs(y = "AIC", x = NULL,
+       title = "Model Fit Comparison (lower is better)") +
   theme_minimal()
-
 ```
-
 
 
 

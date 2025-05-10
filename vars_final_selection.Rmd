@@ -83,7 +83,7 @@ sapply(dmv_data, function(x) if (is.factor(x)) nlevels(x) else NA)
 # ###
 dmv_rf = randomForest(asthma_prev ~ ., data = dmv_data, importance = T, na.action = na.roughfix)
 dmv_rf
-
+plot(dmv_rf)
 ```
 
 ```{r}
@@ -251,11 +251,31 @@ cat("Tuned RF Relative RMSE (%):", round(relative_rmse_tuned, 2), "%\n")
 ```{r}
 importance_values <- importance(dmv_rf, type = 1)
 print(importance_values)
-varImpPlot(dmv_rf, type = 1)
-top_10_vars <- names(sort(importance_values[, 1], decreasing = TRUE))[1:10]
-print(top_10_vars)
-dmv_top_10_vars_data <- dmv_data[, c("asthma_prev", top_10_vars)]
-write.csv(dmv_top_10_vars_data, "dmv_top_10_vars_data.csv", row.names = FALSE)
+
+library(randomForest)
+library(tibble)
+library(dplyr)
+library(ggplot2)
+
+imp_df <- as_tibble(importance(dmv_rf, type = 1), rownames = "Variable") %>%
+  arrange(desc(`%IncMSE`)) %>%
+  slice(1:15)
+
+ggplot(imp_df, aes(x = reorder(Variable, `%IncMSE`), y = `%IncMSE`)) +
+  geom_point(size = 3) +
+  coord_flip() +
+  labs(
+    title = "Top 15 Important Variables (%IncMSE)",
+    x = "Variable",
+    y = "% Increase in MSE"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+# top_10_vars <- names(sort(importance_values[, 1], decreasing = TRUE))[1:10]
+# print(top_10_vars)
+# dmv_top_10_vars_data <- dmv[, c("asthma_prev", top_10_vars)]
+# write.csv(dmv_top_10_vars_data, "dmv_top_10_vars_data.csv", row.names = FALSE)
 # top_20_vars <- names(sort(importance_values[, 1], decreasing = TRUE))[1:20]
 # dmv_top_20_vars_data <- dmv_data[, c("asthma_prev", top_20_vars)]
 # write.csv(dmv_top_20_vars_data, "dmv_top_20_vars_data.csv", row.names = FALSE)
@@ -514,6 +534,14 @@ print(final_vars)
 model_data <- dmv %>%
   select(all_of(c("asthma_prev", final_vars))) %>%
   drop_na()
+
+# Export
+model_data <- dmv %>%
+  select(all_of(c("fips", "asthma_prev", final_vars))) %>%
+  drop_na()
+
+write.csv(model_data, "final_model_data.csv", row.names = FALSE)
+
 
 ```
 ## Visualization for the Final Selection
